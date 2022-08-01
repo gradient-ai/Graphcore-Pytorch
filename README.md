@@ -16,40 +16,6 @@ It provides a generic interface on which the other frameworks are built.
 - [Tutorial 5: Matrix-vector multiplication](poplar/tut5_matrix_vector)
 - [Tutorial 6: Matrix-vector multiplication optimisation](poplar/tut6_matrix_vector_opt)
 
-## TensorFlow 1
-
-Getting started with the IPU:
-
-- [Starter tutorial: MNIST training example](../simple_applications/tensorflow/mnist)
-- [Tutorial 1: Porting a simple example](tensorflow1/basics/tut1_porting_a_model)
-
-Exchanging data between the host and the IPU:
-
-- [Tutorial 2: Loops and data pipelines](tensorflow1/basics/tut2_loops_data_pipeline)
-
-Maximising compute on the IPU:
-
-- [Training a model using half- and mixed-precision](tensorflow1/half_precision_training)
-
-Using multiple IPUs and handling large models:
-
-- [Converting a model to run on multiple IPUs with pipelining](tensorflow1/pipelining)
-
-## TensorFlow 2
-
-Getting started with the IPU:
-
-- [Starter tutorial: MNIST training example](../simple_applications/tensorflow2/mnist)
-- [TensorFlow 2 Keras: How to run on the IPU](tensorflow2/keras)
-
-Exchanging data between the host and the IPU:
-
-- [TensorFlow 2: How to use infeed/outfeed queues](tensorflow2/infeed_outfeed)
-
-Debugging and analysis:
-
-- [TensorFlow 2: How to use TensorBoard](tensorflow2/tensorboard)
-
 ## PyTorch
 
 Getting started with the IPU:
