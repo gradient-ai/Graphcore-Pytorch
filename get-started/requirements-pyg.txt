@@ -1,0 +1,14 @@
+# Install pre-built wheels for PyTorch Geometric that are compatible with 
+# poptorch
+--find-links https://data.pyg.org/whl/torch-1.10.0+cpu.html
+
+torch-scatter==2.0.9
+torch-sparse==0.6.13
+torch-cluster==1.6.0
+torch-spline-conv==1.2.1
+torch-geometric==2.0.4
+
+# Visualisation packages
+matplotlib==3.5.2
+periodictable==1.6.1
+py3Dmol==1.8.0
