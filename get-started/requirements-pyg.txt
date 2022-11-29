@@ -2,13 +2,15 @@
 # poptorch
 --find-links https://data.pyg.org/whl/torch-1.10.0+cpu.html
 
+torch-cluster==1.6.0
 torch-scatter==2.0.9
 torch-sparse==0.6.13
-torch-cluster==1.6.0
 torch-spline-conv==1.2.1
-torch-geometric==2.0.4
+pyg-nightly==2.1.0.dev20221128
 
 # Visualisation packages
-matplotlib==3.5.2
+pandas==1.5.0
+matplotlib==3.6.0
 periodictable==1.6.1
-py3Dmol==1.8.0
+py3Dmol==1.8.1
+seaborn==0.12.1
