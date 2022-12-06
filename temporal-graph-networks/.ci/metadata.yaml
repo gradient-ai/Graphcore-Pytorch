@@ -1,0 +1,2 @@
+# Docker image type options: pytorch, pytorch_18_04, tensorflow2, tensorflow2_18_04
+docker_image_type: pytorch

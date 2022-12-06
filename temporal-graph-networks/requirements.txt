@@ -1,0 +1,6 @@
+numpy
+torch-geometric
+torch-scatter
+torch-sparse==0.6.13
+tqdm==4.60.0
+pytest==6.2.5
