@@ -72,17 +72,17 @@ def arange_like(n: int, ref: torch.Tensor) -> torch.Tensor:
     return torch.arange(n, device=ref.device, dtype=ref.dtype)
 
 
-def prepare_data(data):
+def prepare_data(data, target=4):
     """
     Prepares QM9 molecules for training SchNet for HOMO-LUMO gap prediction
     task.  Outputs a data object with attributes:
 
         z: the atomic number as a vector of integers with length [num_atoms]
         pos: the atomic position as a [num_atoms, 3] tensor of float32 values.
-        y: the HOMO-LUMO gap energy in electronvolts (eV).
+        y: the training target value. By default this will be the HOMO-LUMO gap
+        energy in electronvolts (eV).
     """
-    gap_target = 4
-    return Data(z=data.z, pos=data.pos, y=data.y[0, gap_target].view(-1))
+    return Data(z=data.z, pos=data.pos, y=data.y[0, target].view(-1))
 
 
 def padding_graph(num_nodes):
@@ -90,6 +90,7 @@ def padding_graph(num_nodes):
     Create a molecule of non-interacting atoms defined as having atomic charge
     of zero to use for padding a mini-batch up to a known maximum size
     """
+    assert num_nodes > 0
     return Data(z=torch.zeros(num_nodes, dtype=torch.long),
                 pos=torch.zeros(num_nodes, 3),
                 y=torch.zeros(1))
@@ -156,7 +157,8 @@ def create_dataloader(dataset,
                       batch_size=2,
                       max_nodes_per_graph=32,
                       shuffle=False,
-                      num_workers=0):
+                      num_workers=0,
+                      keys=("z", "pos", "batch", "y")):
     """
     Creates a data loader for graph datasets
     Applies the mini-batching method of concatenating multiple graphs into a 
@@ -166,7 +168,6 @@ def create_dataloader(dataset,
     Automatically adds a padding graph to fill up each mini-batch up to contain
     max_nodes_per_graph * (batch_size-1) nodes.
     """
-    keys = ("z", "pos", "batch", "y")
     collater = CombinedBatchingCollator(batch_size - 1, keys,
                                         max_nodes_per_graph)
 
@@ -175,4 +176,5 @@ def create_dataloader(dataset,
                                batch_size=batch_size - 1,
                                shuffle=shuffle,
                                num_workers=num_workers,
-                               collate_fn=collater)
+                               collate_fn=collater,
+                               mode=poptorch.DataLoaderMode.Async)
