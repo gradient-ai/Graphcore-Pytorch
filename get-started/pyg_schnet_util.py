@@ -115,7 +115,7 @@ class CombinedBatchingCollator:
         super().__init__()
         self.mini_batch_size = mini_batch_size
         self.keys = keys
-        self.max_nodes_per_batch = max_nodes_per_graph * (mini_batch_size + 1)
+        self.max_nodes_per_batch = max_nodes_per_graph * mini_batch_size
 
     def add_padding_graph(self, data_list):
         num_nodes = sum(d.num_nodes for d in data_list)
@@ -157,7 +157,7 @@ def create_dataloader(dataset,
                       batch_size=2,
                       max_nodes_per_graph=32,
                       shuffle=False,
-                      num_workers=0,
+                      max_num_workers=32,
                       keys=("z", "pos", "batch", "y")):
     """
     Creates a data loader for graph datasets
@@ -168,13 +168,18 @@ def create_dataloader(dataset,
     Automatically adds a padding graph to fill up each mini-batch up to contain
     max_nodes_per_graph * (batch_size-1) nodes.
     """
-    collater = CombinedBatchingCollator(batch_size - 1, keys,
-                                        max_nodes_per_graph)
+    batch_size = batch_size - 1
+    collater = CombinedBatchingCollator(batch_size, keys, max_nodes_per_graph)
+
+    combined_batch_size = batch_size * ipu_opts.replication_factor * \
+        ipu_opts.device_iterations * ipu_opts.Training.gradient_accumulation
+    num_batches = len(dataset) // combined_batch_size
+    num_workers = min(num_batches, max_num_workers)
 
     return poptorch.DataLoader(ipu_opts,
                                dataset=dataset,
-                               batch_size=batch_size - 1,
+                               batch_size=batch_size,
                                shuffle=shuffle,
                                num_workers=num_workers,
                                collate_fn=collater,
-                               mode=poptorch.DataLoaderMode.Async)
+                               persistent_workers=num_workers > 0)
