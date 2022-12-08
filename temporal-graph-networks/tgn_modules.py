@@ -338,7 +338,7 @@ class TGNMemory(nn.Module):
         neighbours = write_n_id.roll(int(idx.size(1)))   # swap src and dst for the symmetric triplet
         direction = torch.eye(2).repeat_interleave(idx.shape[1], 0)   # [1,0] for src ids, [0,1] for dst ids
         if self.target == "ipu":
-            direction = direction.to("xla")
+            direction = direction.to(neighbours.device)
 
         self._memory_ints.index_put_(
             indices=(masked_indices,),
