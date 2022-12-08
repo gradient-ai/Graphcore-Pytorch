@@ -6,9 +6,7 @@ torch-cluster==1.6.0
 torch-scatter==2.0.9
 torch-sparse==0.6.13
 torch-spline-conv==1.2.1
-# TODO replace with pyg-nightly build once this PR is merged:
-#https://github.com/pyg-team/pytorch_geometric/pull/6175
-torch-geometric@git+https://github.com/graphcore/pytorch_geometric-fork@lazy-aggr-error
+pyg-nightly==2.2.0.dev20221208
 
 # Visualisation packages
 pandas==1.5.0
