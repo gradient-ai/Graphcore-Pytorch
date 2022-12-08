@@ -33,6 +33,8 @@ from model.optimized_gpt2_attn import OptimizedGPT2AttentionBuffer, OptimizedGPT
 
 import argparse
 
+executable_cache_dir = os.getenv("POPLAR_EXECUTABLE_CACHE_DIR", "./exe_cache/")
+
 def create_args(model_name_or_path, single_ipu, layers_per_ipu, matmul_proportion,prompt=None, **kwargs):
     args = argparse.Namespace(
         batch_size=1,
@@ -46,12 +48,11 @@ def create_args(model_name_or_path, single_ipu, layers_per_ipu, matmul_proportio
         stop_token='#',
         temperature=1.2,
         tokenizer_type=0,
-        topk=3,
+        topk=1,
         model_name_or_path=model_name_or_path,
         layers_per_ipu = layers_per_ipu,
         matmul_proportion = matmul_proportion,
         single_ipu=single_ipu,
-        user_input = False
         )
     
     for i in kwargs:
@@ -134,7 +135,8 @@ def get_options(args):
     opts.autoRoundNumIPUs(True)
     opts.setAvailableMemoryProportion(mem_prop)
     opts._Popart.set("saveInitializersToFile", "weights.bin")
-    opts.enableExecutableCaching("./exe_cache/"+args.model_name_or_path)
+    opts.enableExecutableCaching(executable_cache_dir)
+    opts.randomSeed(42)
     if not args.single_ipu:
         opts.setExecutionStrategy(poptorch.ShardedExecution())
     return opts
@@ -153,20 +155,16 @@ def get_input(tokenizer, args):
     #Get input and save it if nessercary
     if args.prompt is not None:
         text = args.prompt
-    elif args.user_input:
-        text = input("Input: ")
     else:
         raise ValueError("You must provide a prompt to run inference, please set the variable `prompt` when initialising your arguments.")
     
     input_len = len(text)
     text_ids = tokenizer.encode(text, add_special_tokens=False)
-    txt_len = len(text_ids)
     
-    return text_ids, txt_len, input_len
+    return text_ids, input_len
 
 def run_model(text_ids, model, tokenizer, input_len, args):
-
-    input_ids_all = torch.tensor(text_ids).long()
+    
     all_ids = np.array([[text_ids[0]] for _ in range(args.batch_size)])
     position_ids = torch.zeros(args.batch_size, 1).to(torch.int32)
 
@@ -227,14 +225,16 @@ def gpt2(args):
 
 def initialise_model(args):
     model , tokenizer = gpt2(args)
-    text_ids, txt_len, input_len = get_input(tokenizer, args)
+    text_ids, input_len = get_input(tokenizer, args)
     prompt = run_model(text_ids, model, tokenizer, input_len, args)
     return prompt , model, tokenizer
 
-def sentiment_analysis(args, prompt , run_model , model, tokenizer):
+def sentiment_analysis(prompt):
+    args = create_args("gpt-2",False,None,None,prompt)
+    prompt , model, tokenizer = initialise_model(args)
     user_input = "### Message: " + input() + " Sentiment:"
     args.prompt = prompt + user_input
-    text_ids, txt_len, input_len = get_input(tokenizer, args)
+    text_ids, input_len = get_input(tokenizer, args)
     model_output = run_model(text_ids, model, tokenizer, input_len, args)
     output = model_output[len(prompt):]
     return prompt, output
@@ -257,6 +257,7 @@ class Pipeline:
     
     def __call__(self, prompt:str) -> str:
         self.args.prompt = prompt
-        text_ids, txt_len, input_len = get_input(self.tokenizer, self.args)
+        text_ids, input_len = get_input(self.tokenizer, self.args)
         model_output = run_model(text_ids, self.model, self.tokenizer, input_len, self.args)
+        model_output = model_output.replace(self.args.stop_token, "\n")
         return model_output
