@@ -3,27 +3,13 @@
 # There may be manual modifications in this file,
 # be careful when updating.
 
-gradient_repository_options: &gradient_repository_options
-  repository:
-    origin: https://github.com/graphcore/Graphcore-Pytorch-fork.git
-    ref: prepare-sdk-release-3.0
-
-
-examples_repository_options: &examples_repository_options
-  repository:
-    origin: https://github.com/graphcore/examples.git
-    ref: v3.0.0
-
-
 Graphcore-Pytorch-README_first:
-  # <<: *gradient_repository_options
   location: ../
   generated: true
   notebook:
     file: README_first.ipynb
 
 tgn:
-  # <<: *gradient_repository_options
   location: ../temporal-graph-networks
   generated: true
   notebook:
@@ -33,7 +19,6 @@ tgn:
 
 
 finetuning-bert:
-  # <<: *gradient_repository_options
   location: ../finetuning-bert
   generated: true
   notebook:
@@ -42,7 +27,6 @@ finetuning-bert:
   requirements_file: requirements.txt
 
 gpt2-textgen:
-  # <<: *gradient_repository_options
   location: ../gpt2-text-generation
   generated: true
   notebook:
@@ -51,7 +35,6 @@ gpt2-textgen:
   requirements_file: requirements.txt
 
 vit-model-training:
-  # <<: *gradient_repository_options
   location: ../vit-model-training
   generated: true
   notebook:
@@ -61,7 +44,6 @@ vit-model-training:
 
 # GNN team testing separately
 get-started-PyG-SchNetGNN:
-  # <<: *gradient_repository_options
   location: ../schnet-graph-network
   generated: true
   notebook:
@@ -70,7 +52,6 @@ get-started-PyG-SchNetGNN:
   requirements_file: requirements-pyg.txt
 
 tutorial-basics-walkthrough:
-  # <<: *gradient_repository_options
   location: ../learning-PyTorch-on-IPU/basics
   generated: true
   notebook:
@@ -80,7 +61,6 @@ tutorial-basics-walkthrough:
 
 
 efficient_data_loading-walkthrough:
-  # <<: *gradient_repository_options
   location: ../learning-PyTorch-on-IPU/efficient_data_loading
   generated: true
   notebook:
@@ -89,7 +69,6 @@ efficient_data_loading-walkthrough:
 
 
 mixed_precision-walkthrough:
-  # <<: *gradient_repository_options
   location: ../learning-PyTorch-on-IPU/mixed_precision
   generated: true
   notebook:
@@ -99,7 +78,6 @@ mixed_precision-walkthrough:
 
 
 pipelining-walkthrough:
-  # <<: *gradient_repository_options
   location: ../learning-PyTorch-on-IPU/pipelining
   generated: true
   notebook:
@@ -107,7 +85,11 @@ pipelining-walkthrough:
     timeout: 1200
   requirements_file: requirements.txt
 
-
+# examples_repository_options: &examples_repository_options
+#   repository:
+#     origin: https://github.com/graphcore/examples.git
+#     ref: v3.0.0
+#
 # pytorch_resnet50_train_gen_pod16:
 #   <<: *examples_repository_options
 #   location: ../vision/cnns/pytorch/train
