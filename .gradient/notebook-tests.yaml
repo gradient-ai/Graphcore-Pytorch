@@ -1,8 +1,3 @@
-# Generated file from directory Graphcore-Pytorch on Wed 12 Oct 2022 18:06:47 BST
-# By running 'generate-yaml.sh'.
-# There may be manual modifications in this file,
-# be careful when updating.
-
 Graphcore-Pytorch-README_first:
   location: ../
   generated: true
