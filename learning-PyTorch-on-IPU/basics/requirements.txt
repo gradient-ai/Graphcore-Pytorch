@@ -1,0 +1,5 @@
+torchvision==0.11.1
+scikit-learn
+matplotlib
+tqdm
+Pillow
