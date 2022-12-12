@@ -36,10 +36,10 @@ run_tests(){
 
 
     export VIRTUAL_ENV="/some/fake/venv/GC-automated-paperspace-test-${4}"
-    LOG_FOLDER="${5}/log_${4}_$(date +'%Y-%m-%d-%H_%M')"
+    LOG_FOLDER="${5}/log_${4}_$(date +'%Y-%m-%d-%H_%M_%S')"
     TEST_CONFIG_FILE="${6}"
     mkdir -p ${LOG_FOLDER}
-
+    cd /notebooks/
     python -m examples_utils platform_assessment --spec ${TEST_CONFIG_FILE} \
         --ignore-errors \
         --log-dir $LOG_FOLDER \
@@ -50,7 +50,6 @@ run_tests(){
     tar -czvf "${LOG_FOLDER}.tar.gz" ${LOG_FOLDER}
     echo "PAPERSPACE-AUTOMATED-TESTING: Testing complete"
 }
-
 # Prep the huggingface token
 export HUGGING_FACE_HUB_TOKEN=${7}
 
@@ -66,6 +65,7 @@ else
     run_tests ${@}
 fi
 # Make the notebook stop itself
+echo "Test finished shutting down notebook"
 sleep 5
 gradient apiKey ${1}
 gradient notebooks stop --id ${PAPERSPACE_METRIC_WORKLOAD_ID}

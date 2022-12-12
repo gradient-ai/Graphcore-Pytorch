@@ -2,27 +2,12 @@
 # Copyright (c) 2022 Graphcore Ltd. All rights reserved.
 # Script to be sourced on launch of the Gradient Notebook
 
-
-# called from root folder in container
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-
-symlink-public-resources() {
-    public_source_dir=${1}
-    target_dir=${2}
-    echo "Symlinking - ${public_source_dir} to ${target_dir}"
-
-    # Make sure it exists otherwise you'll copy your current dir
-    mkdir -p ${public_source_dir}
-    cd ${public_source_dir}
-    find -type d -exec mkdir -p "${target_dir}/{}" \;
-    #find -type f -not -name "*.lock" -exec cp -sP "${PWD}/{}" "${target_dir}/{}" \;
-    find -type f -not -name "*.lock" -print0 | xargs -0 -P 50 -I {} sh -c "cp -sP \"${PWD}/{}\" \"${target_dir}/{}\""
-    cd -
-}
-
-DETECTED_NUMBER_OF_IPUS="4"
-
-IPU_ARG=${1:-"${DETECTED_NUMBER_OF_IPUS}"}
+DETECTED_NUMBER_OF_IPUS=$(python .gradient/available_ipus.py)
+if [[ "$1" == "test" ]]; then
+    IPU_ARG="${DETECTED_NUMBER_OF_IPUS}"
+else
+    IPU_ARG=${1:-"${DETECTED_NUMBER_OF_IPUS}"}
+fi
 
 export NUM_AVAILABLE_IPU=${IPU_ARG}
 export GRAPHCORE_POD_TYPE="pod${IPU_ARG}"
@@ -43,13 +28,9 @@ export HF_DATASETS_CACHE="/tmp/huggingface_caches/datasets"
 export POPTORCH_CACHE_DIR="${POPLAR_EXECUTABLE_CACHE_DIR}"
 export POPTORCH_LOG_LEVEL=ERR
 
-prepare_datasets(){
-    # symlink exe_cache files
-    symlink-public-resources "${PUBLIC_DATASET_DIR}/exe_cache" $POPLAR_EXECUTABLE_CACHE_DIR
-    # Symlink squad
-    symlink-public-resources "${PUBLIC_DATASET_DIR}/huggingface_caches/datasets/squad" "${HF_DATASETS_CACHE}/squad"
-    # symlink local dataset used by vit-model-training notebook
-    symlink-public-resources "${PUBLIC_DATASET_DIR}/datasets/chest-xray-nihcc" "${DATASET_DIR}/chest-xray-nihcc"
-}
+nohup /notebooks/.gradient/prepare-datasets.sh ${@} & tail -f nohup.out &
 
-nohup prepare_datasets & tail -f nohup.out &
+export PIP_DISABLE_PIP_VERSION_CHECK=1 CACHE_DIR=/tmp
+jupyter lab --allow-root --ip=0.0.0.0 --no-browser --ServerApp.trust_xheaders=True \
+            --ServerApp.disable_check_xsrf=False --ServerApp.allow_remote_access=True \
+            --ServerApp.allow_origin='*' --ServerApp.allow_credentials=True
