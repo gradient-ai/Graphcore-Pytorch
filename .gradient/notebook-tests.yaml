@@ -17,14 +17,14 @@ examples_repository_options: &examples_repository_options
 
 Graphcore-Pytorch-README_first:
   # <<: *gradient_repository_options
-  location: .
+  location: ../
   generated: true
   notebook:
     file: README_first.ipynb
 
 tgn:
   # <<: *gradient_repository_options
-  location: temporal-graph-networks
+  location: ../temporal-graph-networks
   generated: true
   notebook:
     file: Train_TGN.ipynb
@@ -34,7 +34,7 @@ tgn:
 
 finetuning-bert:
   # <<: *gradient_repository_options
-  location: finetuning-bert
+  location: ../finetuning-bert
   generated: true
   notebook:
     file: Fine-tuning-BERT.ipynb
@@ -43,7 +43,7 @@ finetuning-bert:
 
 gpt2-textgen:
   # <<: *gradient_repository_options
-  location: gpt2-text-generation
+  location: ../gpt2-text-generation
   generated: true
   notebook:
     file: gpt2_sentiment_analysis.ipynb
@@ -52,7 +52,7 @@ gpt2-textgen:
 
 vit-model-training:
   # <<: *gradient_repository_options
-  location: vit-model-training
+  location: ../vit-model-training
   generated: true
   notebook:
     file: walkthrough.ipynb
@@ -62,7 +62,7 @@ vit-model-training:
 # GNN team testing separately
 # get-started-PyG-SchNetGNN:
   <<: *gradient_repository_options
-#   location: ./get-started
+#   location: .././get-started
 #   generated: true
 #   notebook:
 #     file: PyG-SchNetGNN.ipynb
@@ -70,7 +70,7 @@ vit-model-training:
 
 tutorial-basics-walkthrough:
   # <<: *gradient_repository_options
-  location: ./learning-PyTorch-on-IPU/basics
+  location: .././learning-PyTorch-on-IPU/basics
   generated: true
   notebook:
     file: walkthrough.ipynb
@@ -79,7 +79,7 @@ tutorial-basics-walkthrough:
 
 efficient_data_loading-walkthrough:
   # <<: *gradient_repository_options
-  location: ./learning-PyTorch-on-IPU/efficient_data_loading
+  location: .././learning-PyTorch-on-IPU/efficient_data_loading
   generated: true
   notebook:
     file: walkthrough.ipynb
@@ -87,7 +87,7 @@ efficient_data_loading-walkthrough:
 
 mixed_precision-walkthrough:
   # <<: *gradient_repository_options
-  location: ./learning-PyTorch-on-IPU/mixed_precision
+  location: .././learning-PyTorch-on-IPU/mixed_precision
   generated: true
   notebook:
     file: walkthrough.ipynb
@@ -96,7 +96,7 @@ mixed_precision-walkthrough:
 
 pipelining-walkthrough:
   # <<: *gradient_repository_options
-  location: ./learning-PyTorch-on-IPU/pipelining
+  location: .././learning-PyTorch-on-IPU/pipelining
   generated: true
   notebook:
     file: walkthrough.ipynb
@@ -105,7 +105,7 @@ pipelining-walkthrough:
 
 # pytorch_resnet50_train_gen_pod16:
 #   <<: *examples_repository_options
-#   location: vision/cnns/pytorch/train
+#   location: ../vision/cnns/pytorch/train
 #   requirements_file: ../requirements.txt
 #   required_apt_packages: ../required_apt_packages.txt
 #   data:
@@ -143,7 +143,7 @@ pipelining-walkthrough:
 
 # pytorch_bert_large_packed_pretrain_gen_pod16:
 #   <<: *examples_repository_options
-#   location: nlp/bert/pytorch
+#   location: ../nlp/bert/pytorch
 #   requirements_file: requirements.txt
 #   required_apt_packages:
 #     - libopenmpi-dev
