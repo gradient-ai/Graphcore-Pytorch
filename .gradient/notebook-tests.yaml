@@ -60,17 +60,17 @@ vit-model-training:
   requirements_file: requirements.txt
 
 # GNN team testing separately
-# get-started-PyG-SchNetGNN:
-  <<: *gradient_repository_options
-#   location: .././get-started
-#   generated: true
-#   notebook:
-#     file: PyG-SchNetGNN.ipynb
-#   requirements_file: requirements-pyg.txt
+get-started-PyG-SchNetGNN:
+  # <<: *gradient_repository_options
+  location: ../schnet-graph-network
+  generated: true
+  notebook:
+    file: PyG-SchNetGNN.ipynb
+  requirements_file: requirements-pyg.txt
 
 tutorial-basics-walkthrough:
   # <<: *gradient_repository_options
-  location: .././learning-PyTorch-on-IPU/basics
+  location: ../learning-PyTorch-on-IPU/basics
   generated: true
   notebook:
     file: walkthrough.ipynb
@@ -79,7 +79,7 @@ tutorial-basics-walkthrough:
 
 efficient_data_loading-walkthrough:
   # <<: *gradient_repository_options
-  location: .././learning-PyTorch-on-IPU/efficient_data_loading
+  location: ../learning-PyTorch-on-IPU/efficient_data_loading
   generated: true
   notebook:
     file: walkthrough.ipynb
@@ -87,7 +87,7 @@ efficient_data_loading-walkthrough:
 
 mixed_precision-walkthrough:
   # <<: *gradient_repository_options
-  location: .././learning-PyTorch-on-IPU/mixed_precision
+  location: ../learning-PyTorch-on-IPU/mixed_precision
   generated: true
   notebook:
     file: walkthrough.ipynb
@@ -96,7 +96,7 @@ mixed_precision-walkthrough:
 
 pipelining-walkthrough:
   # <<: *gradient_repository_options
-  location: .././learning-PyTorch-on-IPU/pipelining
+  location: ../learning-PyTorch-on-IPU/pipelining
   generated: true
   notebook:
     file: walkthrough.ipynb
