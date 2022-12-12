@@ -66,6 +66,7 @@ get-started-PyG-SchNetGNN:
   generated: true
   notebook:
     file: PyG-SchNetGNN.ipynb
+    timeout: 3600
   requirements_file: requirements-pyg.txt
 
 tutorial-basics-walkthrough:
@@ -74,6 +75,7 @@ tutorial-basics-walkthrough:
   generated: true
   notebook:
     file: walkthrough.ipynb
+    timeout: 1200
   requirements_file: requirements.txt
 
 
@@ -83,6 +85,7 @@ efficient_data_loading-walkthrough:
   generated: true
   notebook:
     file: walkthrough.ipynb
+    timeout: 1200
 
 
 mixed_precision-walkthrough:
@@ -91,6 +94,7 @@ mixed_precision-walkthrough:
   generated: true
   notebook:
     file: walkthrough.ipynb
+    timeout: 1200
   requirements_file: requirements.txt
 
 
@@ -100,6 +104,7 @@ pipelining-walkthrough:
   generated: true
   notebook:
     file: walkthrough.ipynb
+    timeout: 1200
   requirements_file: requirements.txt
 
 
