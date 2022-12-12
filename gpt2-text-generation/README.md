@@ -66,14 +66,14 @@ To obtain the data used for pretraining follow the below instructions.
 
 **Download**
 
-Download the latest raw wikipedia dump from: <https://dumps.wikimedia.org/enwiki/latest/enwiki-latest-pages-articles.xml.bz2>
+Download the latest raw wikipedia dump from: <https://dumps.wikimedia.org/enwiki/latest/enwiki-latest-pages-articles.xml.bz2>. You can also download a sample here <https://dumps.wikimedia.org/enwiki/latest/enwiki-latest-pages-articles1.xml-p1p41242.bz2>.
 
 **Extract**
 
 Once you have downloaded the raw file, extract it using [WikiExtractor](https://github.com/attardi/wikiextractor).
 ```
-pip install wikiextractor
-python -m wikiextractor.WikiExtractor --json --no-templates -o wikipedia_extracted enwiki-latest-pages-articles.xml.bz2
+pip3 install wikiextractor==3.0.6
+python3 -m wikiextractor.WikiExtractor --json --no-templates -o wikipedia_extracted enwiki-latest-pages-articles.xml.bz2
 ```
 Then merge all extracted file into a single json file.
 ```
@@ -81,19 +81,22 @@ find ./wikipedia_extracted/ -depth -name wiki_* -exec cat {} + > wikipedia_data.
 ```
 **Preprocess**
 
-We recommand to follow Nvidia's Megatron for data preprocessing and generated the training data, see <https://github.com/NVIDIA/Megatron-LM#data-preprocessing>.
+We recommand to follow Nvidia's Megatron for data preprocessing and generated the training data, see <https://github.com/NVIDIA/Megatron-LM/tree/0ed2f6ac943560ab0a8a58b6628a669af8c250db#data-preprocessing>.
 
 ```
-git clone https://github.com/NVIDIA/Megatron-LM.git
-python Megatron-LM/preprocess_data.py \
+git clone https://github.com/NVIDIA/Megatron-LM.git@0ed2f6ac943560ab0a8a58b6628a669af8c250db
+pip3 install nltk
+python3 Megatron-LM/tools/preprocess_data.py	 \
        --input wikipedia_data.json \
        --output-prefix wikipedia-gpt2 \
-       --vocab tokenizer/gpt2-vocab-50256.json \
+       --vocab $APP_DIR/tokenizer/gpt2-vocab-50256.json \
        --dataset-impl mmap \
        --tokenizer-type GPT2BPETokenizer \
-       --merge-file tokenizer/gpt2-merges-50256.txt \
+       --merge-file $APP_DIR/tokenizer/gpt2-merges-50256.txt \
        --append-eod
 ```
+Where `$APP_DIR` is the directory of this README.
+
 The output files are named `wikipedia-gpt2_text_document.bin` and `wikipedia-gpt2_text_document.idx`, set `--dataset mmap` and `--input-files <path>/wikipedia-gpt2_text_document` in the training scripts to start gpt2 pretraining.
 
 
