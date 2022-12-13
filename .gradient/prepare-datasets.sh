@@ -28,7 +28,7 @@ echo "Starting preparation of datasets"
 exe_cache_source_dir="${PUBLIC_DATASET_DIR}/poplar-executables-pytorch"
 symlink-public-resources "${exe_cache_source_dir}" $POPLAR_EXECUTABLE_CACHE_DIR
 # Symlink squad
-symlink-public-resources "${PUBLIC_DATASET_DIR}/huggingface_caches/datasets/squad" "${HF_DATASETS_CACHE}/squad"
+symlink-public-resources "${PUBLIC_DATASET_DIR}/squad" "${HF_DATASETS_CACHE}/squad"
 # symlink local dataset used by vit-model-training notebook
 # symlink-public-resources "${PUBLIC_DATASET_DIR}/datasets/chest-xray-nihcc" "${DATASET_DIR}/chest-xray-nihcc"
 
