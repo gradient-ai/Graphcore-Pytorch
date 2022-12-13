@@ -12,7 +12,6 @@ tgn:
     timeout: 10000
   requirements_file: requirements.txt
 
-
 finetuning-bert:
   location: ../finetuning-bert
   generated: true
@@ -29,13 +28,14 @@ gpt2-textgen:
     timeout: 10000
   requirements_file: requirements.txt
 
-vit-model-training:
-  location: ../vit-model-training
-  generated: true
-  notebook:
-    file: walkthrough.ipynb
-    timeout: 10000
-  requirements_file: requirements.txt
+# Disabled pending upload of the chest-xray dataset
+# vit-model-training:
+#   location: ../vit-model-training
+#   generated: true
+#   notebook:
+#     file: walkthrough.ipynb
+#     timeout: 10000
+#   requirements_file: requirements.txt
 
 # GNN team testing separately
 get-started-PyG-SchNetGNN:
