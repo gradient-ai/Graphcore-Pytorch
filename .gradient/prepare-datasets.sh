@@ -25,7 +25,7 @@ symlink-public-resources() {
 
 echo "Starting preparation of datasets"
 # symlink exe_cache files
-exe_cache_source_dir="${PUBLIC_DATASET_DIR}/exe_cache_pytorch"
+exe_cache_source_dir="${PUBLIC_DATASET_DIR}/poplar-executables-pytorch"
 symlink-public-resources "${exe_cache_source_dir}" $POPLAR_EXECUTABLE_CACHE_DIR
 # Symlink squad
 symlink-public-resources "${PUBLIC_DATASET_DIR}/huggingface_caches/datasets/squad" "${HF_DATASETS_CACHE}/squad"
