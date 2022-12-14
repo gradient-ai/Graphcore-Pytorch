@@ -648,7 +648,7 @@ sure that we were aware of the limitations of our model.
 ### Next steps:
 To continue learning about PopTorch and how to use it to run your models on the
 IPU, look at our tutorials on [efficient data
-loading](../efficient_data_loading), [pipelining your model in
-PopTorch](../pipelining) and [fine-tuning a BERT model to run on the
-IPU](../finetuning_bert).
+loading](../efficient_data_loading), [using half and mixed precision](../mixed_precision), [fine-tuning a BERT model to run on the
+ IPU](../../finetuning_bert) and [pipelining your model in
+PopTorch](../pipelining).
 """
