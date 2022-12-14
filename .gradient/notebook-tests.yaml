@@ -80,6 +80,15 @@ pipelining-walkthrough:
     timeout: 1200
   requirements_file: requirements.txt
 
+
+# Useful references
+useful-managing-ipu-resources:
+  location: ../useful-tips
+  generated: true
+  notebook:
+    file: managing_ipu_resources.ipynb
+    timeout: 1000
+
 # examples_repository_options: &examples_repository_options
 #   repository:
 #     origin: https://github.com/graphcore/examples.git
