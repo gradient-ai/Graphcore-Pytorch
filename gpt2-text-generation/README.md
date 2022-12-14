@@ -81,10 +81,10 @@ find ./wikipedia_extracted/ -depth -name wiki_* -exec cat {} + > wikipedia_data.
 ```
 **Preprocess**
 
-We recommand to follow Nvidia's Megatron for data preprocessing and generated the training data, see <https://github.com/NVIDIA/Megatron-LM/tree/0ed2f6ac943560ab0a8a58b6628a669af8c250db#data-preprocessing>.
+We recommend to follow Nvidia's Megatron for data preprocessing and generated the training data, see <https://github.com/NVIDIA/Megatron-LM/tree/0ed2f6ac943560ab0a8a58b6628a669af8c250db#data-preprocessing>.
 
 ```
-git clone https://github.com/NVIDIA/Megatron-LM.git@0ed2f6ac943560ab0a8a58b6628a669af8c250db
+git clone https://github.com/NVIDIA/Megatron-LM.git
 pip3 install nltk
 python3 Megatron-LM/tools/preprocess_data.py	 \
        --input wikipedia_data.json \
