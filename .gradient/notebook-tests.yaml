@@ -20,13 +20,14 @@ finetuning-bert:
     timeout: 4000
   requirements_file: requirements.txt
 
-gpt2-textgen:
-  location: ../gpt2-text-generation
-  generated: true
-  notebook:
-    file: gpt2_sentiment_analysis.ipynb
-    timeout: 10000
-  requirements_file: requirements.txt
+# Removed pending model work
+# gpt2-textgen:
+#   location: ../gpt2-text-generation
+#   generated: true
+#   notebook:
+#     file: gpt2_sentiment_analysis.ipynb
+#     timeout: 10000
+#   requirements_file: requirements.txt
 
 # Disabled pending upload of the chest-xray dataset
 # vit-model-training:
@@ -79,6 +80,15 @@ pipelining-walkthrough:
     file: walkthrough.ipynb
     timeout: 1200
   requirements_file: requirements.txt
+
+
+# Useful references
+useful-managing-ipu-resources:
+  location: ../useful-tips
+  generated: true
+  notebook:
+    file: managing_ipu_resources.ipynb
+    timeout: 1000
 
 # examples_repository_options: &examples_repository_options
 #   repository:
