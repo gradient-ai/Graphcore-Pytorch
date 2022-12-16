@@ -9,18 +9,6 @@ This tutorial covers the basics of model making in PyTorch, using
 a PopTorch model so that it can be run on a Graphcore IPU.
 """
 """
-To run the Python version of this tutorial:
-
-1. Download and install the Poplar SDK. Run the `enable.sh` scripts for Poplar and PopART as described in the [Getting
-  Started](https://docs.graphcore.ai/en/latest/getting-started.html) guide for your IPU system.
-2. For repeatability we recommend that you create and activate a Python virtual environment. You can do this with:
-   a. create a virtual environment in the directory `venv`: `virtualenv -p python3 venv`;
-   b. activate it: `source venv/bin/activate`.
-3. Install the Python packages that this tutorial needs with `python -m pip install -r requirements.txt`.
-
-sst_ignore_jupyter
-"""
-"""
 ### Running on Paperspace
 
 The Paperspace environment lets you run this notebook with no set up. To improve your experience we preload datasets and pre-install packages, this can take a few minutes, if you experience errors immediately after starting a session please try restarting the kernel before contacting support.

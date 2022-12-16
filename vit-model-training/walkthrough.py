@@ -32,9 +32,6 @@ Also download the `Data_Entry_2017_v2020.csv` file, which contains the labels. B
 
 Requirements:
 
-- A Poplar SDK environment enabled (see the [Getting
- Started](https://docs.graphcore.ai/en/latest/getting-started.html) guide for
- your IPU system)
 - Python packages installed with `python -m pip install -r requirements.txt`
 """
 # %pip install -q -r requirements.txt

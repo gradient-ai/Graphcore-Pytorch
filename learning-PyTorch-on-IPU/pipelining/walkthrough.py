@@ -42,9 +42,6 @@ Additionally, some knowledge of data loading in poptorch and batching on IPU is 
 """
 """
 Requirements:
-- Python 3 installed (we recommend to create a virtual environment).
-- A Poplar SDK environment enabled
-   (see the [Getting Started](https://docs.graphcore.ai/en/latest/getting-started.html) guide for your IPU system)
 - Python packages installed with `python3 -m pip install -r requirements.txt`
 """
 # sst_ignore_md
@@ -636,10 +633,7 @@ test(inference_model, test_data)
 """
 1. Prepare the environment.
 
-    Install the Poplar SDK following the instructions in the [Getting Started](https://docs.graphcore.ai/en/latest/getting-started.html) guide for your IPU system.
-Make sure to run the `enable.sh` scripts for both Poplar and PopART and activate a Python virtual environment with PopTorch installed.
-
-    Then install the package requirements:
+Install the package requirements:
 
 ``
 python3 -m pip install -r requirements.txt
