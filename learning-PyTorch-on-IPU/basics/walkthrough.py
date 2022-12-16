@@ -9,34 +9,10 @@ This tutorial covers the basics of model making in PyTorch, using
 a PopTorch model so that it can be run on a Graphcore IPU.
 """
 """
-To run the Python version of this tutorial:
+### Running on Paperspace
 
-1. Download and install the Poplar SDK. Run the `enable.sh` scripts for Poplar and PopART as described in the [Getting
-  Started](https://docs.graphcore.ai/en/latest/getting-started.html) guide for your IPU system.
-2. For repeatability we recommend that you create and activate a Python virtual environment. You can do this with:
-   a. create a virtual environment in the directory `venv`: `virtualenv -p python3 venv`;
-   b. activate it: `source venv/bin/activate`.
-3. Install the Python packages that this tutorial needs with `python -m pip install -r requirements.txt`.
-
-sst_ignore_jupyter
-"""
-"""
-To run the Jupyter notebook version of this tutorial:
-
-1. Enable a Poplar SDK environment (see the [Getting
-  Started](https://docs.graphcore.ai/en/latest/getting-started.html) guide for
-  your IPU system)
-2. In the same environment, install the Jupyter notebook server:
-   `python -m pip install jupyter`
-3. Launch a Jupyter Server on a specific port:
-   `jupyter-notebook --no-browser --port <port number>`
-4. Connect via SSH to your remote machine, forwarding your chosen port:
-   `ssh -NL <port number>:localhost:<port number>
-   <your username>@<remote machine>`
-
-For more details about this process, or if you need troubleshooting, see our
-[guide on using IPUs from Jupyter
-notebooks](../../standard_tools/using_jupyter/README.md).
+The Paperspace environment lets you run this notebook with no set up. To improve your experience we preload datasets and pre-install packages, this can take a few minutes, if you experience errors immediately after starting a session please try restarting the kernel before contacting support.
+If a problem persists or you want to give us feedback on the content of this notebook, please reach out to through our community of developers using our [slack channel](graphcorecommunity.slack.com) or raise a [GitHub issue](https://github.com/gradient-ai/Graphcore-Pytorch/issues).
 """
 # %pip install -q -r requirements.txt
 # sst_ignore_md
