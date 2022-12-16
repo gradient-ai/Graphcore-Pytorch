@@ -15,30 +15,10 @@ Before starting this tutorial, we recommend that you read through our
 [MNIST starting tutorial](../../../simple_applications/pytorch/mnist/).
 """
 """
-Requirements:
+### Running on Paperspace
 
-- A Poplar SDK environment enabled (see the [Getting
-  Started](https://docs.graphcore.ai/en/latest/software.html#getting-started)
-  guide for your IPU system)
-- The PopTorch Python library installed (see
-  [Installation](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.0.0/installation.html)
-  of the PopTorch User Guide)
-"""
-"""
-To run the Jupyter notebook version of this tutorial:
-
-1. Enable a Poplar SDK environment
-2. In the same environment, install the Jupyter notebook server:
-   `python -m pip install jupyter`
-3. Launch a Jupyter Server on a specific port:
-   `jupyter-notebook --no-browser --port <port number>`
-4. Connect via SSH to your remote machine, forwarding your chosen port:
-   `ssh -NL <port number>:localhost:<port number>
-   <your username>@<remote machine>`
-
-For more details about this process, or if you need troubleshooting, see our
-[guide on using IPUs from Jupyter
-notebooks](../../standard_tools/using_jupyter/README.md).
+The Paperspace environment lets you run this notebook with no set up. To improve your experience we preload datasets and pre-install packages, this can take a few minutes, if you experience errors immediately after starting a session please try restarting the kernel before contacting support.
+If a problem persists or you want to give us feedback on the content of this notebook, please reach out to through our community of developers using our [slack channel](graphcorecommunity.slack.com) or raise a [GitHub issue](https://github.com/gradient-ai/Graphcore-Pytorch/issues).
 """
 """
 ## PyTorch and PopTorch DataLoader
