@@ -242,7 +242,7 @@ def _main() -> None:
         duration = time.time() - t0
         tput = dataset_size / duration
         print(f'Epoch {epoch}: Loss {loss:.4f}, Time {duration:.4f}, '
-              f'Throughput {tput} samples/s')
+                f'Throughput: {tput:.4f} samples/s')
 
         if epoch % validate_every == 0 or epoch == epochs:
             aps, aucs = run_test(model_eval, test_dl)
