@@ -4,49 +4,6 @@ Graphcore-Pytorch-README_first:
   notebook:
     file: README_first.ipynb
 
-tgn:
-  location: ../temporal-graph-networks
-  generated: true
-  notebook:
-    file: Train_TGN.ipynb
-    timeout: 10000
-  requirements_file: requirements.txt
-
-finetuning-bert:
-  location: ../finetuning-bert
-  generated: true
-  notebook:
-    file: Fine-tuning-BERT.ipynb
-    timeout: 4000
-  requirements_file: requirements.txt
-
-# Removed pending model work
-# gpt2-textgen:
-#   location: ../gpt2-text-generation
-#   generated: true
-#   notebook:
-#     file: gpt2_sentiment_analysis.ipynb
-#     timeout: 10000
-#   requirements_file: requirements.txt
-
-# Disabled pending upload of the chest-xray dataset
-# vit-model-training:
-#   location: ../vit-model-training
-#   generated: true
-#   notebook:
-#     file: walkthrough.ipynb
-#     timeout: 10000
-#   requirements_file: requirements.txt
-
-# GNN team testing separately
-get-started-PyG-SchNetGNN:
-  location: ../schnet-graph-network
-  generated: true
-  notebook:
-    file: PyG-SchNetGNN.ipynb
-    timeout: 3600
-  requirements_file: requirements-pyg.txt
-
 tutorial-basics-walkthrough:
   location: ../learning-PyTorch-on-IPU/basics
   generated: true
@@ -80,6 +37,51 @@ pipelining-walkthrough:
     file: walkthrough.ipynb
     timeout: 1200
   requirements_file: requirements.txt
+
+
+finetuning-bert:
+  location: ../finetuning-bert
+  generated: true
+  notebook:
+    file: Fine-tuning-BERT.ipynb
+    timeout: 10000
+  requirements_file: requirements.txt
+
+tgn:
+  location: ../temporal-graph-networks
+  generated: true
+  notebook:
+    file: Train_TGN.ipynb
+    timeout: 10000
+  requirements_file: requirements.txt
+
+# Removed pending model work
+# gpt2-textgen:
+#   location: ../gpt2-text-generation
+#   generated: true
+#   notebook:
+#     file: gpt2_sentiment_analysis.ipynb
+#     timeout: 10000
+#   requirements_file: requirements.txt
+
+# Disabled pending upload of the chest-xray dataset
+# vit-model-training:
+#   location: ../vit-model-training
+#   generated: true
+#   notebook:
+#     file: walkthrough.ipynb
+#     timeout: 10000
+#   requirements_file: requirements.txt
+
+# GNN team testing separately
+get-started-PyG-SchNetGNN:
+  location: ../schnet-graph-network
+  generated: true
+  notebook:
+    file: PyG-SchNetGNN.ipynb
+    timeout: 3600
+  requirements_file: requirements-pyg.txt
+
 
 
 # Useful references
