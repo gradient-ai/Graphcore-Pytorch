@@ -32,6 +32,9 @@ exe_cache_source_dir="${PUBLIC_DATASET_DIR}/poplar-executables-pytorch"
 symlink-public-resources "${exe_cache_source_dir}" $POPLAR_EXECUTABLE_CACHE_DIR
 # Symlink squad
 symlink-public-resources "${PUBLIC_DATASET_DIR}/squad" "${HF_DATASETS_CACHE}/squad"
+# Symlink OGB Wiki dataset and checkpoint
+symlink-public-resources "${PUBLIC_DATASET_DIR}/ogbl_wikikg2_custom" "${DATASET_DIR}/ogbl_wikikg2_custom"
+
 # symlink local dataset used by vit-model-training notebook
 # symlink-public-resources "${PUBLIC_DATASET_DIR}/datasets/chest-xray-nihcc" "${DATASET_DIR}/chest-xray-nihcc"
 
