@@ -55,6 +55,15 @@ tgn:
     timeout: 10000
   requirements_file: requirements.txt
 
+
+distributed-kge:
+  location: ../distributed-kge
+  generated: true
+  notebook:
+    file: KgeModelling.ipynb
+    timeout: 10000
+  requirements_file: requirements.txt
+
 # Removed pending model work
 # gpt2-textgen:
 #   location: ../gpt2-text-generation
