@@ -39,21 +39,21 @@ pipelining-walkthrough:
   requirements_file: requirements.txt
 
 
-# finetuning-bert:
-#   location: ../finetuning-bert
-#   generated: true
-#   notebook:
-#     file: Fine-tuning-BERT.ipynb
-#     timeout: 10000
-#   requirements_file: requirements.txt
+finetuning-bert:
+  location: ../finetuning-bert
+  generated: true
+  notebook:
+    file: Fine-tuning-BERT.ipynb
+    timeout: 10000
+  requirements_file: requirements.txt
 
-# tgn:
-#   location: ../temporal-graph-networks
-#   generated: true
-#   notebook:
-#     file: Train_TGN.ipynb
-#     timeout: 10000
-#   requirements_file: requirements.txt
+tgn:
+  location: ../temporal-graph-networks
+  generated: true
+  notebook:
+    file: Train_TGN.ipynb
+    timeout: 10000
+  requirements_file: requirements.txt
 
 # Removed pending model work
 # gpt2-textgen:
