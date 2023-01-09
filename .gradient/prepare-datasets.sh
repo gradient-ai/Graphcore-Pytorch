@@ -36,10 +36,10 @@ symlink-public-resources "${PUBLIC_DATASET_DIR}/squad" "${HF_DATASETS_CACHE}/squ
 symlink-public-resources "${PUBLIC_DATASET_DIR}/ogbl_wikikg2_custom" "${DATASET_DIR}/ogbl_wikikg2_custom"
 
 # symlink local dataset used by vit-model-training notebook
-# symlink-public-resources "${PUBLIC_DATASET_DIR}/datasets/chest-xray-nihcc" "${DATASET_DIR}/chest-xray-nihcc"
+symlink-public-resources "${PUBLIC_DATASET_DIR}/chest-xray-nihcc" "${DATASET_DIR}/chest-xray-nihcc"
 
 # pre-install the correct version of optimum for this release
-python -m pip install "optimum-graphcore>0.4, <0.5"
+python -m pip install "optimum-graphcore>=0.5, <0.6"
 
 echo "Finished running setup.sh."
 # Run automated test if specified

@@ -8,3 +8,6 @@ integrations:
   ogbl_wikikg2_custom:
     type: dataset
     ref: paperspace/ds5fogtxxi0h935:wqp02u5
+  chest-xray-nihcc:
+    type: dataset
+    ref: paperspace/dsubmtfp0zqcj10:d82qc8f
