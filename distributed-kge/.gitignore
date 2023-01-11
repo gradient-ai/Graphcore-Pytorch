@@ -1,0 +1,10 @@
+.ipynb_checkpoints
+__pycache__
+.venv
+.venvs
+.vscode
+
+/build
+/data
+/local
+/out

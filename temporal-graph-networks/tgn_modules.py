@@ -13,6 +13,7 @@ import torch.nn.functional as F
 import math
 import numpy as np
 import torch_geometric as G
+from torch_geometric.loader import TemporalDataLoader
 import copy
 from torch_scatter import scatter_sum
 import poptorch
@@ -46,7 +47,10 @@ class Data:
         train, val, test = self.data.train_val_test_split(
             val_ratio=0.15, test_ratio=0.15
         )
-        self.partitions = dict(train=train, val=val, test=test)
+
+        self.loader = dict(train=TemporalDataLoader(train, batch_size=self.batch_size),
+                           val=TemporalDataLoader(val, batch_size=self.batch_size),
+                           test=TemporalDataLoader(test, batch_size=self.batch_size))
         feature_size = self.data.msg.shape[-1]
         self.batch_spec = dict(
             # Map from idx -> (global) node ID
@@ -70,10 +74,10 @@ class Data:
             self.data.num_nodes, size=10
         )
         self.neighbour_loaders["train"] = copy.deepcopy(neighbour_loader)
-        for batch in self.partitions["train"].seq_batches(self.batch_size):
+        for batch in self.loader["train"]:
             neighbour_loader.insert(batch.src, batch.dst)
         self.neighbour_loaders["val"] = copy.deepcopy(neighbour_loader)
-        for batch in self.partitions["val"].seq_batches(self.batch_size):
+        for batch in self.loader["val"]:
             neighbour_loader.insert(batch.src, batch.dst)
         self.neighbour_loaders["test"] = copy.deepcopy(neighbour_loader)
 
@@ -84,22 +88,20 @@ class Data:
             torch.manual_seed(12345)
             self.neg_samples[part] = [
                 torch.randint(dst_min, dst_max + 1, batch.src.shape, dtype=torch.long)
-                for batch in self.partitions[part].seq_batches(self.batch_size)
+                for batch in self.loader[part]
             ]
 
     def n_batches(self, partition):
         """Exact total (padded) batch count for this partition."""
-        return int(np.ceil(self.partitions[partition].num_events / self.batch_size))
+        return int(np.ceil(self.loader[partition].data.num_events / self.batch_size))
 
     def unpadded_batches(self, partition):
         """Generate unpadded numpy batches (encapsulates PyTorch bits)."""
         neighbour_loader = copy.deepcopy(self.neighbour_loaders[partition])
         dst_min, dst_max = int(self.data.dst.min()), int(self.data.dst.max())
         node_id_to_idx = torch.empty(self.data.num_nodes, dtype=torch.long)
-        expected_count = self.n_batches(partition)
-        for batch_n, batch in enumerate(
-            self.partitions[partition].seq_batches(self.batch_size)
-        ):
+        expected_count = self.n_batches(partition=partition)
+        for batch_n, batch in enumerate(self.loader[partition]):
             assert batch_n < expected_count
             neg_dst = (
                 torch.randint(dst_min, dst_max + 1, batch.src.shape, dtype=torch.long)

@@ -158,11 +158,8 @@ class CustomModel(nn.Module):
 > make sure you re-run all the cells below this one, including this entire cell
 > as well:
 """
-# Cast the model parameters to FP16
-model_half = True
-
-# Cast the data to FP16
-data_half = True
+# Cast the model parameters and data to FP16
+execution_half = True
 
 # Cast the accumulation of gradients values types of the optimiser to FP16
 optimizer_half = True
@@ -183,36 +180,28 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    "--model-half",
-    dest="model_half",
+    "--execution-half",
     action="store_true",
-    help="Cast the model parameters to FP16",
-)
-parser.add_argument(
-    "--data-half", dest="data_half", action="store_true", help="Cast the data to FP16"
+    help="Cast the model parameters and data to FP16",
 )
 parser.add_argument(
     "--optimizer-half",
-    dest="optimizer_half",
     action="store_true",
     help="Cast the accumulation type of the optimiser to FP16",
 )
 parser.add_argument(
     "--stochastic-rounding",
-    dest="stochastic_rounding",
     action="store_true",
     help="Use stochastic rounding",
 )
 parser.add_argument(
     "--partials-half",
-    dest="partials_half",
     action="store_true",
     help="Set partials data type to FP16",
 )
 args = parser.parse_args()
 
-model_half = args.model_half
-data_half = args.data_half
+execution_half = args.execution_half
 optimizer_half = args.optimizer_half
 stochastic_rounding = args.stochastic_rounding
 partials_half = args.partials_half
@@ -229,7 +218,7 @@ do:
 """
 model = CustomModel()
 
-if model_half:
+if execution_half:
     model = model.half()
 """
 For this tutorial, we will cast all the model's parameters to FP16.
@@ -267,7 +256,7 @@ transform_list = [
     transforms.ToTensor(),
     transforms.Normalize((0.5,), (0.5,)),
 ]
-if data_half:
+if execution_half:
     transform_list.append(transforms.ConvertImageDtype(torch.half))
 
 transform = transforms.Compose(transform_list)
@@ -282,17 +271,6 @@ test_dataset = torchvision.datasets.FashionMNIST(
 )
 
 # sst_hide_output
-"""
-If the model has not been converted to half precision, but the input data has,
-then some layers of the model may be converted to use FP16. Conversely, if the
-input data has not been converted, but the model has, then the input tensors
-will be converted to FP16 on the IPU. This behaviour is the opposite of
-PyTorch's default behaviour.
-
-> **NOTE**: To stop PopTorch automatically downcasting tensors and parameters,
-> so that it preserves PyTorch's default behaviour (upcasting), use the option:
-> `opts.Precision.halfFloatCasting(poptorch.HalfFloatCastingBehavior.HalfUpcastToFloat)`.
-"""
 """
 ### Optimizers and loss scaling
 
