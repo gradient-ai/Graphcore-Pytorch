@@ -5,10 +5,10 @@ Graphcore-Pytorch-README_first:
     file: README_first.ipynb
 
 gptj-finetuning:
-  location: ../gptj-text-generation/finetuning.ipynb
+  location: ../gptj-text-generation/
   generated: true
   notebook:
-    file: walkthrough.ipynb
+    file: finetuning.ipynb
     timeout: 15000
   requirements_file: requirements.txt
 
