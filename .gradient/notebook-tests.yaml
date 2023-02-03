@@ -4,6 +4,14 @@ Graphcore-Pytorch-README_first:
   notebook:
     file: README_first.ipynb
 
+gptj-finetuning:
+  location: ../gptj-text-generation/finetuning.ipynb
+  generated: true
+  notebook:
+    file: walkthrough.ipynb
+    timeout: 15000
+  requirements_file: requirements.txt
+
 tutorial-basics-walkthrough:
   location: ../learning-PyTorch-on-IPU/basics
   generated: true
