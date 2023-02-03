@@ -160,6 +160,7 @@ class Checkpoint(Config):
     to_keep: int = 4
     """Maximum number of checkpoints to keep"""
 
+
 @dataclass
 class GPTJConfig(Config):
     """Configuration of PopXL GPT"""
@@ -171,14 +172,14 @@ class GPTJConfig(Config):
 
     @property
     def gradient_accumulation(self):
-        denom = (self.execution.data_parallel *
-                 self.execution.micro_batch_size)
+        denom = self.execution.data_parallel * self.execution.micro_batch_size
         if self.training.global_batch_size % denom != 0:
             raise RuntimeError(
                 "Unable to set gradient accumulation to match the global batch size. "
                 "global_batch_size % (data_parallel * micro_batch_size) != 0. "
                 f"{self.training.global_batch_size} % "
-                f"({self.execution.data_parallel} * {self.execution.micro_batch_size}) != 0")
+                f"({self.execution.data_parallel} * {self.execution.micro_batch_size}) != 0"
+            )
 
         return self.training.global_batch_size // denom
 
@@ -191,9 +192,13 @@ class GPTJConfig(Config):
 
     def validate(self):
         if self.checkpoint.steps > 0:
-            assert self.checkpoint.save, 'You need to specify a save path to save the checkpoint every X steps. '\
-                                         'Disable this error by setting `checkpoint.steps = 0`'
-        assert self.model.hidden_size % self.model.attention.heads == 0, "Hidden size should be a multiple of attention heads"
+            assert self.checkpoint.save, (
+                "You need to specify a save path to save the checkpoint every X steps. "
+                "Disable this error by setting `checkpoint.steps = 0`"
+            )
+        assert (
+            self.model.hidden_size % self.model.attention.heads == 0
+        ), "Hidden size should be a multiple of attention heads"
 
 
 if __name__ == "__main__":

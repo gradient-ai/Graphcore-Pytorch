@@ -20,8 +20,10 @@ class TestPretraining(SubProcessChecker):
             "--global_batch_size 16 --micro_batch_size 2 --data_parallel 2 --tensor_parallel 2 "
             "--vocab_size 128 --sequence_length 8 --rotary_dim 16 "
             "--hidden_size 64 --heads 4",
-            root_dir, ["Duration"],
-            env=gptj_root_env_path())
+            root_dir,
+            ["Duration"],
+            env=gptj_root_env_path(),
+        )
 
     def test_inference(self):
         self.run_command(
@@ -29,5 +31,7 @@ class TestPretraining(SubProcessChecker):
             "--micro_batch_size 16 --data_parallel 1 --tensor_parallel 2 "
             "--vocab_size 128 --sequence_length 8 --rotary_dim 16 "
             "--hidden_size 64 --heads 4",
-            root_dir, ["Duration"],
-            env=gptj_root_env_path())
+            root_dir,
+            ["Duration"],
+            env=gptj_root_env_path(),
+        )

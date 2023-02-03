@@ -21,7 +21,7 @@ class Config(Serializable):
 
 def flag(default: bool, *args, **kwargs):
     """Use this to have a bool argument that's true when used as a flag.
-        For example: "--dropout" always means True"""
+    For example: "--dropout" always means True"""
     return field(default=default, nargs="?", const=True, *args, **kwargs)
 
 
@@ -39,8 +39,7 @@ def parse_args_with_config_file(dclass: DataclassType[Dataclass], *args) -> Data
 
     defaults = dclass()
     if cargs.config is not None:
-        set_dataclass_defaults(dclass,
-                               dclass.load(cargs.config, drop_extra_fields=False))
+        set_dataclass_defaults(dclass, dclass.load(cargs.config, drop_extra_fields=False))
 
     dclass_dest = dclass.__name__.lower()
 
@@ -48,8 +47,7 @@ def parse_args_with_config_file(dclass: DataclassType[Dataclass], *args) -> Data
     parser.add_arguments(dclass, dest=dclass_dest)
 
     # This is here only for the help message
-    parser.add_argument("--config", type=str,
-                        help="Path to preset config")
+    parser.add_argument("--config", type=str, help="Path to preset config")
 
     args = parser.parse_args(remaining_argv)
     if cargs.config is not None:
@@ -58,12 +56,12 @@ def parse_args_with_config_file(dclass: DataclassType[Dataclass], *args) -> Data
 
 
 def parse_args_with_presets(
-        dclass: DataclassType[Dataclass],
-        config_file: Union[str, Path],
-        presets_key: str,
-        default: str,
-        custom_args: Optional[Callable[[ArgumentParser], None]] = None,
-        CLI_args: Optional[str] = None,
+    dclass: DataclassType[Dataclass],
+    config_file: Union[str, Path],
+    presets_key: str,
+    default: str,
+    custom_args: Optional[Callable[[ArgumentParser], None]] = None,
+    CLI_args: Optional[str] = None,
 ) -> Tuple[Dataclass, argparse.Namespace]:
     config_file = str(config_file)
     if config_file.endswith((".yml", ".yaml")):
@@ -81,14 +79,12 @@ def parse_args_with_presets(
     presets = list(config_dict.keys())
 
     cparser = argparse.ArgumentParser("Config Parser", add_help=False)
-    cparser.add_argument("--config", choices=presets,
-                         type=str, default=default)
+    cparser.add_argument("--config", choices=presets, type=str, default=default)
     cargs, remaining_argv = cparser.parse_known_args(CLI_args)
 
     defaults = dclass()
     if cargs.config is not None:
-        set_dataclass_defaults(dclass,
-                               dclass.from_dict(config_dict[cargs.config], drop_extra_fields=False))
+        set_dataclass_defaults(dclass, dclass.from_dict(config_dict[cargs.config], drop_extra_fields=False))
 
     dclass_dest = dclass.__name__.lower()
 
@@ -96,8 +92,9 @@ def parse_args_with_presets(
     parser.add_arguments(dclass, dest=dclass_dest)
 
     # This is here only for the help message
-    parser.add_argument("--config", choices=presets, type=str, default=default,
-                        help=f"Preset Configs from {config_file}")
+    parser.add_argument(
+        "--config", choices=presets, type=str, default=default, help=f"Preset Configs from {config_file}"
+    )
 
     if custom_args:
         custom_args(parser)
@@ -114,13 +111,17 @@ def parse_args_with_presets(
 class Choice(Enum):
     def __init_subclass__(cls) -> None:
         if not hasattr(cls, "decode"):
+
             def decode(value):
                 return cls[value]
+
             setattr(cls, "decode", decode)
         register_decoding_fn(cls, cls.decode)
 
         if not hasattr(cls, "encode"):
+
             def _encode(enum):
                 return str(enum.name)
+
             setattr(cls, "encode", _encode)
         encode.register(cls, cls.encode)
