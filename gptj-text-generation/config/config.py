@@ -160,6 +160,15 @@ class Checkpoint(Config):
     to_keep: int = 4
     """Maximum number of checkpoints to keep"""
 
+    optim_state: bool = True
+    """Whether to include the optimiser state in checkpoints"""
+
+
+@dataclass
+class Inference(Config):
+    output_length: int = 5
+    """Number of tokens to generate"""
+
 
 @dataclass
 class GPTJConfig(Config):
@@ -169,6 +178,7 @@ class GPTJConfig(Config):
     training: Training = Training()
     execution: Execution = Execution()
     checkpoint: Checkpoint = Checkpoint()
+    inference: Inference = Inference()
 
     @property
     def gradient_accumulation(self):

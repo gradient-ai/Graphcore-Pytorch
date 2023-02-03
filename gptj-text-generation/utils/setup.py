@@ -73,6 +73,8 @@ def gptj_config_setup(
             parser.add_argument(
                 "--wandb", default="True", choices=["False", "True"], help="Initialise Weights and Biases"
             )
+        # needed for jupyter notebooks
+        parser.add_argument("-f", type=str, default="", help=f"jupyter")
 
     config, args = parse_args_with_presets(GPTJConfig, config_file, presets_key, default, custom_args, CLI_args)
     config: GPTJConfig  # type: ignore
@@ -116,13 +118,11 @@ def gptj_config_setup(
 
 
 def gptj_fine_tuning_setup(
-    config_file: Union[str, Path],
-    presets_key: str,
-    default_config: str,
+    config_file: Union[str, Path], presets_key: str, default_config: str, wandb_setup: bool = False
 ) -> Tuple[GPTJConfig, argparse.Namespace, Optional[GPTJForCausalLM]]:
     """GPT-J setup for fine tunning scripts"""
     config, args, pretrained = gptj_config_setup(
-        config_file, presets_key, default_config, wandb_setup=False, hf_model_setup=True
+        config_file, presets_key, default_config, wandb_setup=wandb_setup, hf_model_setup=True
     )
 
     return config, args, pretrained
@@ -137,8 +137,7 @@ def logging_setup(args, config):
         stream=sys.stdout,
         force=True,
     )
-    logging.info(f"Staring. Process id: {os.getpid()}")
-    logging.info(f"Config: {config}")
+    logging.info(f"Starting. Process id: {os.getpid()}")
 
 
 def xl_hf_config_check(config: GPTJConfig, hf_config: HFConfig):

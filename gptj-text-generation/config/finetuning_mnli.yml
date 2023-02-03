@@ -76,3 +76,4 @@ release:
       data_parallel: 2
       tensor_parallel: 4
       attention_serialisation: 2
+

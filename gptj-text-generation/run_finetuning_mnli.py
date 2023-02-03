@@ -4,7 +4,6 @@ import time
 import logging
 from functools import partial
 
-from transformers import AutoTokenizer
 import wandb
 import numpy as np
 
@@ -21,17 +20,15 @@ from modelling.embedding import GPTJEmbeddingsTP
 from modelling.hf_mapping import hf_mapping_lm_tp
 from modelling.gptj_lm import GPTJLMHeadLossAndGradTP
 from data.data_utils import WorkerInit
-from datasets import load_dataset
 from utils.utils import tensor_parallel_input, warmup_schedule, suffix_path
-from data.mnli_data import form_text, tokenizes_text, concat_and_transpose
-from data.hf_data_utils import group_texts
+from data.mnli_data import prepare_mnli_dataset, concat_and_transpose
 from data.data_utils import StatefulDataLoader
 from datetime import datetime
 import os
 import popdist
 
 
-def training(config: GPTJConfig, session: TaskSession, pretrained):
+def training(config: GPTJConfig, session: TaskSession, pretrained, dataset):
     samples_per_step = config.execution.device_iterations * config.training.global_batch_size
     n_shards = config.execution.tensor_parallel
     replicas = session.ir.instance_replication_factor
@@ -50,42 +47,15 @@ def training(config: GPTJConfig, session: TaskSession, pretrained):
 
     session.add_session_state_info({"total_steps": 0})
 
-    with timer("Data preperation"):
-        tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-j-6B")
-        tokenizer.add_special_tokens({"pad_token": "<|extratoken_1|>"})  # index 50257
-        dataset = load_dataset("glue", "mnli", split="train")
-        dataset = dataset.map(
-            form_text,
-            remove_columns=["hypothesis", "premise", "label", "idx"],
-            load_from_cache_file=True,
-            desc="Generating text prompt",
-        )
-        dataset = dataset.map(
-            tokenizes_text(tokenizer),
-            batched=True,
-            batch_size=1000,
-            num_proc=1,
-            remove_columns=dataset.column_names,
-            load_from_cache_file=True,
-            desc="Tokenizing text",
-        )
-        dataset = dataset.map(
-            group_texts(config),
-            batched=True,
-            batch_size=1000,
-            num_proc=1,
-            load_from_cache_file=True,
-            desc="Packing sequences",
-        )
-        train_dl = StatefulDataLoader(
-            dataset,
-            batch_size=samples_per_step,
-            drop_last=True,
-            num_workers=1,  # TODO 64
-            worker_init_fn=WorkerInit(config.model.seed),
-            persistent_workers=True,
-            collate_fn=concat_and_transpose,
-        )
+    train_dl = StatefulDataLoader(
+        dataset,
+        batch_size=samples_per_step,
+        drop_last=True,
+        num_workers=1,  # TODO 64
+        worker_init_fn=WorkerInit(config.model.seed),
+        persistent_workers=True,
+        collate_fn=concat_and_transpose,
+    )
 
     session.dataloader = train_dl
 
@@ -111,74 +81,71 @@ def training(config: GPTJConfig, session: TaskSession, pretrained):
     if checkpoint_dir is not None:
         checkpoint_dir = os.path.join(checkpoint_dir, "Run_{}".format(datetime.now().strftime("%d_%m_%Y_%H_%M")))
 
-    with session:
-        while True:
-            # Training loop
-            # Dataloader automatically count epochs
-            for data in train_dl:
-                start = time.perf_counter()
-                saved_checkpoint = False
+    while True:
+        # Training loop
+        # Dataloader automatically count epochs
+        for data in train_dl:
+            start = time.perf_counter()
+            saved_checkpoint = False
 
-                data_map = {}
-                words = to_numpy(data["input_ids"], session.inputs.words.dtype, copy=False).reshape(
-                    -1, *session.inputs.words.shape
-                )
-                labels = to_numpy(data["labels"], session.inputs.labels.dtype, copy=False).reshape(
-                    -1, *session.inputs.labels.shape
-                )
-                lr = (
-                    np.full((session.ir.num_host_transfers, replicas, 1), lr_schedule[step]).astype("float32").squeeze()
-                )
+            data_map = {}
+            words = to_numpy(data["input_ids"], session.inputs.words.dtype, copy=False).reshape(
+                -1, *session.inputs.words.shape
+            )
+            labels = to_numpy(data["labels"], session.inputs.labels.dtype, copy=False).reshape(
+                -1, *session.inputs.labels.shape
+            )
+            lr = np.full((session.ir.num_host_transfers, replicas, 1), lr_schedule[step]).astype("float32").squeeze()
 
-                data_map[session.inputs.words] = tensor_parallel_input(
-                    words, n_shards, replicas, partial(GPTJEmbeddingsTP.offset_input, config=config)
-                )
-                data_map[session.inputs.labels] = tensor_parallel_input(
-                    labels, n_shards, replicas, partial(GPTJLMHeadLossAndGradTP.offset_input, config=config)
-                )
-                # Add learning rate inputs
-                data_map[session.inputs.lr] = lr
+            data_map[session.inputs.words] = tensor_parallel_input(
+                words, n_shards, replicas, partial(GPTJEmbeddingsTP.offset_input, config=config)
+            )
+            data_map[session.inputs.labels] = tensor_parallel_input(
+                labels, n_shards, replicas, partial(GPTJLMHeadLossAndGradTP.offset_input, config=config)
+            )
+            # Add learning rate inputs
+            data_map[session.inputs.lr] = lr
 
-                # Run program
-                outputs = session.run(data_map)
-                losses = outputs[session.outputs[0]]
+            # Run program
+            outputs = session.run(data_map)
+            losses = outputs[session.outputs[0]]
 
-                # Logging
-                duration = time.perf_counter() - start  # Don't include checkpoint saving
+            # Logging
+            duration = time.perf_counter() - start  # Don't include checkpoint saving
 
-                loss = np.mean(losses.astype(np.float32))
-                throughput = samples_per_step / duration
-                prev_total_steps = total_steps
-                total_steps = config.execution.device_iterations * step
-                result_str = (
-                    f"Step: {total_steps}/{config.training.steps} "
-                    f"Loss: {loss:5.3f} "
-                    f"Duration: {duration:6.4f} s "
-                    f"Throughput: {throughput:6.1f} samples/s "
-                )
-                logging.info(result_str)
-                if popdist.getInstanceIndex() == 0 and wandb.run is not None:
-                    wandb.log({"Loss": loss, "LR": lr_schedule[step], "Throughput": throughput}, step=total_steps)
-                session.session_state["total_steps"] = total_steps
+            loss = np.mean(losses.astype(np.float32))
+            throughput = samples_per_step / duration
+            prev_total_steps = total_steps
+            total_steps = config.execution.device_iterations * step
+            result_str = (
+                f"Step: {total_steps}/{config.training.steps} "
+                f"Loss: {loss:5.3f} "
+                f"Duration: {duration:6.4f} s "
+                f"Throughput: {throughput:6.1f} samples/s "
+            )
+            logging.info(result_str)
+            if popdist.getInstanceIndex() == 0 and wandb.run is not None:
+                wandb.log({"Loss": loss, "LR": lr_schedule[step], "Throughput": throughput}, step=total_steps)
+            session.session_state["total_steps"] = total_steps
 
-                # Periodically save checkpoint
-                if config.checkpoint.steps > 0:
-                    checkpoint_step = total_steps // config.checkpoint.steps
-                    prev_checkpoint_step = prev_total_steps // config.checkpoint.steps
-                    if checkpoint_step - prev_checkpoint_step >= 1 and total_steps >= config.checkpoint.steps:
-                        saved_checkpoint = True
-                        path = os.path.join(checkpoint_dir, f"train_step_{total_steps}")
-                        session.save_checkpoint(path)
+            # Periodically save checkpoint
+            if config.checkpoint.steps > 0:
+                checkpoint_step = total_steps // config.checkpoint.steps
+                prev_checkpoint_step = prev_total_steps // config.checkpoint.steps
+                if checkpoint_step - prev_checkpoint_step >= 1 and total_steps >= config.checkpoint.steps:
+                    saved_checkpoint = True
+                    path = os.path.join(checkpoint_dir, f"train_step_{total_steps}")
+                    session.save_checkpoint(path)
 
-                if total_steps >= config.training.steps:
-                    # Save last checkpoint
-                    if checkpoint_dir is not None and not saved_checkpoint:
-                        path = os.path.join(checkpoint_dir, f"train_step_{total_steps}")
-                        session.save_checkpoint(path)
+            if total_steps >= config.training.steps:
+                # Save last checkpoint
+                if checkpoint_dir is not None and not saved_checkpoint:
+                    path = os.path.join(checkpoint_dir, f"train_step_{total_steps}")
+                    session.save_checkpoint(path)
 
-                    return
+                return
 
-                step += 1
+            step += 1
 
 
 def main():
@@ -190,8 +157,12 @@ def main():
     # Create the training session
     train_session = finetuning_mnli(config)
 
+    # Load dataset
+    with timer("Data preperation"):
+        dataset = prepare_mnli_dataset(config)
+
     # Train
-    training(config, train_session, pretrained)
+    training(config, train_session, pretrained, dataset)
 
 
 if __name__ == "__main__":

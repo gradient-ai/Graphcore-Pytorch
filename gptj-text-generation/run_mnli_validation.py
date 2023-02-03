@@ -5,6 +5,7 @@ from functools import partial, reduce
 from glob import glob
 import re
 import os
+from typing import Optional
 
 import torch
 from tqdm import tqdm
@@ -23,20 +24,26 @@ from utils.inference import batch_inference
 from data.mnli_data import form_text, prepare_validation_features, split_text, postprocess_mnli_predictions
 from config import GPTJConfig
 
-OUTPUT_LENGTH = 5
-
 
 def unwrap(dl):
     for example in tqdm(dl):
         yield torch.tensor(example["input_ids"], dtype=torch.long)
 
 
-def run_validation(config: GPTJConfig, session: TaskSession, checkpoint_path: str, dataset, tokenizer, labels):
+def run_validation(config: GPTJConfig, session: TaskSession, dataset, tokenizer, checkpoint_path: Optional[str] = None):
+    """
+    The session must be opened before calling run_validation.
+    Usage:
+        with session:
+            run_validation(config, session, dataset, tokenizer, labels, checkpoint_path)
+    """
+    labels = dataset["class_label"]
+
     tp = config.execution.tensor_parallel
     rf = config.execution.tensor_parallel * config.execution.data_parallel
 
     with timer("Loading pretrained checkpoint from file to IPU"):
-        with session:
+        if checkpoint_path:
             session.load_checkpoint(checkpoint_path)
 
     def next_token(inputs, lengths):
@@ -51,16 +58,15 @@ def run_validation(config: GPTJConfig, session: TaskSession, checkpoint_path: st
         return torch.LongTensor(next_token_id)
 
     with timer("Running validation"):
-        with session:
-            answers = batch_inference(
-                unwrap(dataset),
-                next_token,
-                config.model.sequence_length,
-                eos_token_id=tokenizer.eos_token_id,  # index 50256
-                pad_token_id=tokenizer.pad_token_id,  # index 50257
-                output_length=OUTPUT_LENGTH,
-                micro_batch_size=config.execution.micro_batch_size,
-            )
+        answers = batch_inference(
+            unwrap(dataset),
+            next_token,
+            config.model.sequence_length,
+            eos_token_id=tokenizer.eos_token_id,  # index 50256
+            pad_token_id=tokenizer.pad_token_id,  # index 50257
+            output_length=config.inference.output_length,
+            micro_batch_size=config.execution.micro_batch_size,
+        )
 
     logging.info("Computing validation metric")
     answers = [tokenizer.decode(a, skip_special_tokens=True) for a in answers]
@@ -73,10 +79,36 @@ def run_validation(config: GPTJConfig, session: TaskSession, checkpoint_path: st
     return metrics
 
 
+def validate(config: GPTJConfig, session: TaskSession, dataset, tokenizer, checkpoint_dir: Optional[str] = None):
+    max_len = reduce(lambda l, e: max(l, len(e["input_ids"])), dataset, 0)
+
+    config.model.sequence_length = max_len + config.inference.output_length
+
+    if checkpoint_dir:
+        files = glob(os.path.expanduser(config.checkpoint.load))
+        for i, f in enumerate(files):
+            step = re.match(r".*step_(\d+).*", f)
+            step = int(step.groups()[0]) if step and len(step.groups()) else -1
+            files[i] = step, f
+        files = sorted(files)
+
+        for step, f in files:
+            step = step if step > 0 else None
+            logging.info(f'Starting validation. File: {f}. Step: {step or "Not known"}')
+            metrics = run_validation(config, session, dataset, tokenizer, f)
+
+            if wandb.run:
+                for k, v in metrics.items():  # type: ignore
+                    wandb.log({k: v, "file": f}, step=step)
+    else:
+        logging.info(f"Starting validation")
+        metrics = run_validation(config, session, dataset, tokenizer)
+
+
 def main():
     # --- Config ---
     config, args, _ = gptj_config_setup(
-        "config/inference.yml", "release", "gpt-j-mnli", hf_model_setup=False, wandb_setup=True
+        "config/inference.yml", "release", "gpt-j-mnli", hf_model_setup=False, wandb_setup=False
     )
     assert config.checkpoint.load is not None, "You must specify a checkpoint to load using --load"
 
@@ -88,7 +120,6 @@ def main():
     dataset = load_dataset("glue", "mnli", split="validation_mismatched")
     dataset = dataset.map(form_text, remove_columns=["hypothesis", "premise", "label", "idx"])
     dataset = dataset.map(split_text)
-    labels = dataset["class_label"]
     dataset = dataset.map(
         prepare_validation_features,
         batched=True,
@@ -97,7 +128,7 @@ def main():
         fn_kwargs={"tokenizer": tokenizer},
     )
     max_len = reduce(lambda l, e: max(l, len(e["input_ids"])), dataset, 0)
-    config.model.sequence_length = max_len + OUTPUT_LENGTH
+    config.model.sequence_length = max_len + config.inference.output_length
 
     # --- Model ---
     session = inference(config)
@@ -111,14 +142,15 @@ def main():
         files[i] = step, f
     files = sorted(files)
 
-    for step, f in files:
-        step = step if step > 0 else None
-        logging.info(f'Starting validation. File: {f}. Step: {step or "Not known"}')
-        metrics = run_validation(config, session, f, dataset, tokenizer, labels)
+    with session:
+        for step, f in files:
+            step = step if step > 0 else None
+            logging.info(f'Starting validation. File: {f}. Step: {step or "Not known"}')
+            metrics = run_validation(config, session, dataset, tokenizer, f)
 
-        if args.wandb:
-            for k, v in metrics.items():  # type: ignore
-                wandb.log({k: v, "file": f}, step=step)
+            if args.wandb:
+                for k, v in metrics.items():  # type: ignore
+                    wandb.log({k: v, "file": f}, step=step)
 
 
 if __name__ == "__main__":
