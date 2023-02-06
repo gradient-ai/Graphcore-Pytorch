@@ -26,6 +26,7 @@ export TRANSFORMERS_CACHE="/tmp/huggingface_caches/checkpoints"
 export HF_DATASETS_CACHE="/tmp/huggingface_caches/datasets"
 
 export POPTORCH_CACHE_DIR="${POPLAR_EXECUTABLE_CACHE_DIR}"
+export POPART_CACHE_DIR="${POPLAR_EXECUTABLE_CACHE_DIR}"
 export POPTORCH_LOG_LEVEL=ERR
 export RDMAV_FORK_SAFE=1
 
