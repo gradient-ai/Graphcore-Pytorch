@@ -21,7 +21,7 @@ from modelling.hf_mapping import hf_mapping_lm_tp
 from modelling.gptj_lm import GPTJLMHeadLossAndGradTP
 from data.data_utils import WorkerInit
 from utils.utils import tensor_parallel_input, warmup_schedule, suffix_path
-from data.mnli_data import prepare_mnli_dataset, concat_and_transpose
+from data.mnli_data import prepare_train_dataset, concat_and_transpose
 from data.data_utils import StatefulDataLoader
 from datetime import datetime
 import os
@@ -159,7 +159,7 @@ def main():
 
     # Load dataset
     with timer("Data preperation"):
-        dataset = prepare_mnli_dataset(config)
+        dataset = prepare_train_dataset(config)
 
     # Train
     training(config, train_session, pretrained, dataset)

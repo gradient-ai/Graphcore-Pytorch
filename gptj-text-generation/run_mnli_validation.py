@@ -5,7 +5,7 @@ from functools import partial, reduce
 from glob import glob
 import re
 import os
-from typing import Optional
+from typing import Optional, Callable
 
 import torch
 from tqdm import tqdm
@@ -21,7 +21,7 @@ from popxl_addons import TaskSession, timer
 from utils.setup import gptj_config_setup
 from utils.utils import tensor_parallel_input, repeat
 from utils.inference import batch_inference
-from data.mnli_data import form_text, prepare_validation_features, split_text, postprocess_mnli_predictions
+from data.mnli_data import form_validation_prompts, prepare_validation_features, postprocess_mnli_predictions
 from config import GPTJConfig
 
 
@@ -29,22 +29,24 @@ def unwrap(dl):
     for example in tqdm(dl):
         yield torch.tensor(example["input_ids"], dtype=torch.long)
 
-
-def run_validation(config: GPTJConfig, session: TaskSession, dataset, tokenizer, checkpoint_path: Optional[str] = None):
+def run_validation(config: GPTJConfig, session: TaskSession, dataset, tokenizer, trained_session: Optional[TaskSession]=None):
     """
-    The session must be opened before calling run_validation.
+    The session must be opened before calling run_validation
     Usage:
         with session:
             run_validation(config, session, dataset, tokenizer, labels, checkpoint_path)
     """
-    labels = dataset["class_label"]
+    assert any((config.checkpoint.load, trained_session)), "You must specify a checkpoint to load weights from or a session with a trained state"
+    
+    if config.checkpoint.load:
+        session.load_checkpoint(config.checkpoint.load)
+    else:
+        session.load_from_session(trained_session)
+
+    labels = dataset["label"]
 
     tp = config.execution.tensor_parallel
     rf = config.execution.tensor_parallel * config.execution.data_parallel
-
-    with timer("Loading pretrained checkpoint from file to IPU"):
-        if checkpoint_path:
-            session.load_checkpoint(checkpoint_path)
 
     def next_token(inputs, lengths):
         data_map = {}
@@ -70,39 +72,7 @@ def run_validation(config: GPTJConfig, session: TaskSession, dataset, tokenizer,
 
     logging.info("Computing validation metric")
     answers = [tokenizer.decode(a, skip_special_tokens=True) for a in answers]
-    metric = load_metric("glue", "mnli_mismatched")
-
-    labels = postprocess_mnli_predictions(labels)
-    formatted_answers = postprocess_mnli_predictions(answers)
-    metrics = metric.compute(predictions=formatted_answers, references=labels)
-    logging.info(metrics)
-    return metrics
-
-
-def validate(config: GPTJConfig, session: TaskSession, dataset, tokenizer, checkpoint_dir: Optional[str] = None):
-    max_len = reduce(lambda l, e: max(l, len(e["input_ids"])), dataset, 0)
-
-    config.model.sequence_length = max_len + config.inference.output_length
-
-    if checkpoint_dir:
-        files = glob(os.path.expanduser(config.checkpoint.load))
-        for i, f in enumerate(files):
-            step = re.match(r".*step_(\d+).*", f)
-            step = int(step.groups()[0]) if step and len(step.groups()) else -1
-            files[i] = step, f
-        files = sorted(files)
-
-        for step, f in files:
-            step = step if step > 0 else None
-            logging.info(f'Starting validation. File: {f}. Step: {step or "Not known"}')
-            metrics = run_validation(config, session, dataset, tokenizer, f)
-
-            if wandb.run:
-                for k, v in metrics.items():  # type: ignore
-                    wandb.log({k: v, "file": f}, step=step)
-    else:
-        logging.info(f"Starting validation")
-        metrics = run_validation(config, session, dataset, tokenizer)
+    return answers
 
 
 def main():
@@ -118,40 +88,33 @@ def main():
 
     # --- Dataset ---
     dataset = load_dataset("glue", "mnli", split="validation_mismatched")
-    dataset = dataset.map(form_text, remove_columns=["hypothesis", "premise", "label", "idx"])
-    dataset = dataset.map(split_text)
+    dataset = dataset.map(form_validation_prompts,
+                          remove_columns=["hypothesis", "premise", "idx"],
+                          load_from_cache_file=False)
     dataset = dataset.map(
         prepare_validation_features,
         batched=True,
         remove_columns=dataset.column_names,
-        load_from_cache_file=True,
+        load_from_cache_file=False,
         fn_kwargs={"tokenizer": tokenizer},
     )
-    max_len = reduce(lambda l, e: max(l, len(e["input_ids"])), dataset, 0)
-    config.model.sequence_length = max_len + config.inference.output_length
+
+    # --- Metric ---
+
+    metric = load_metric("glue", "mnli_mismatched")
 
     # --- Model ---
+    max_len = reduce(lambda l, e: max(l, len(e["input_ids"])), dataset, 0)
+    config.model.sequence_length = max_len + config.inference.output_length
+    logging.info(f"Reducing sequence length to {max_len}")
+
     session = inference(config)
-
-    # --- Validation ---
-    # Parse step from filename
-    files = glob(os.path.expanduser(config.checkpoint.load))
-    for i, f in enumerate(files):
-        step = re.match(r".*step_(\d+).*", f)
-        step = int(step.groups()[0]) if step and len(step.groups()) else -1
-        files[i] = step, f
-    files = sorted(files)
-
     with session:
-        for step, f in files:
-            step = step if step > 0 else None
-            logging.info(f'Starting validation. File: {f}. Step: {step or "Not known"}')
-            metrics = run_validation(config, session, dataset, tokenizer, f)
-
-            if args.wandb:
-                for k, v in metrics.items():  # type: ignore
-                    wandb.log({k: v, "file": f}, step=step)
-
+        answers = run_validation(config, session, dataset, tokenizer)
+        formatted_answers = postprocess_mnli_predictions(answers)
+   
+    metrics = metric.compute(predictions=formatted_answers, references=dataset["label"])
+    logging.info(metrics)
 
 if __name__ == "__main__":
     try:

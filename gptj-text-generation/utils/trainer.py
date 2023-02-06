@@ -6,13 +6,14 @@ from transformers.models.gptj import GPTJForCausalLM
 
 from finetuning_mnli import finetuning_mnli
 from run_finetuning_mnli import training
-from run_mnli_validation import validate
+from run_mnli_validation import run_validation
 from inference import inference
 
 from modelling.hf_mapping import load_lm_to_hf
-from typing import Optional
+from typing import Optional, Callable
 from torch.utils.data import Dataset
 
+#TODO proper type hints & doc
 
 class MNLIFinetuningTrainer:
     def __init__(
@@ -23,11 +24,9 @@ class MNLIFinetuningTrainer:
         eval_dataset: Optional[Dataset] = None,
         eval_config: Optional[GPTJConfig] = None,
         tokenizer: Optional = None,
+        metric : Optional = None,
+        process_answers_func: Optional[Callable] = None,
     ):
-        inference_data = (eval_dataset, eval_config, tokenizer)
-        if any(inference_data) and not all(inference_data):
-            raise ValueError("If you want to dovalidation you need to specify a dataset, a config, and a tokenizer.")
-
         self.config = config
         self.train_session = finetuning_mnli(config)
         self.pretrained = pretrained
@@ -37,6 +36,8 @@ class MNLIFinetuningTrainer:
         self.tokenizer = tokenizer
         self.eval_dataset = eval_dataset
         self.inference_session = self.__build_inference_session()
+        self.metric = metric
+        self.process_answers_func = process_answers_func
 
     def train(self):
         with self.train_session:
@@ -46,25 +47,39 @@ class MNLIFinetuningTrainer:
         self,
         eval_dataset: Optional[Dataset] = None,
         eval_config: Optional[GPTJConfig] = None,
-        tokenizer: Optional = None,
-        checkpoint_dir: Optional[str] = None,
+        tokenizer: Optional = None, 
+        metric: Optional = None,
+        process_answers_func: Optional[Callable] = None,
     ):
-        inference_data = (eval_dataset, eval_config, tokenizer)
-        if any(inference_data) and not all(inference_data):
-            raise ValueError("If you want to do validation you need to specify a dataset, a config, and a tokenizer.")
+        if tokenizer:
+            self.tokenizer = tokenizer
+        
+        assert self.tokenizer is not None, "A tokenizer must be provided for evaluation"
 
-        self.eval_config = eval_config
-        self.tokenizer = tokenizer
-        self.eval_dataset = eval_dataset
-        self.inference_session = self.__build_inference_session()
+        if eval_dataset:
+            self.eval_dataset = eval_dataset
+        assert self.eval_dataset is not None, "A dataset must be provided for evaluation"
 
-        if checkpoint_dir:
-            self.inference_session.load_checkpoint(checkpoint_dir)
-        else:
-            self.inference_session.load_from_session(self.train_session)
+        if metric:
+            self.metric = metric
+        assert self.metric is not None, "A metric must be provided for evaluation"
+
+        if eval_config:
+            self.eval_config = eval_config
+            self.inference_session = self.__build_inference_session()
+
+        if process_answers_func:
+            self.process_answers_func = process_answers_func
+
 
         with self.inference_session:
-            validate(self.eval_config, self.inference_session, self.eval_dataset, self.tokenizer)
+            answers = run_validation(self.eval_config, self.inference_session, self.eval_dataset, self.tokenizer)
+            formatted_answers = self.process_answers_func(answers)
+   
+        metrics = metric.compute(predictions=formatted_answers, references=dataset["label"])
+        logging.info(metrics)
+        return metrics
+
 
     def save_hf_checkpoint(self, hf_ckpt_dir: str, ckpt_load_path: Optional[str] = None) -> GPTJForCausalLM:
         """
