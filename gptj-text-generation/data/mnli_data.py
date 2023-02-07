@@ -9,7 +9,7 @@ from transformers import AutoTokenizer
 from .hf_data_utils import group_texts
 
 
-def form_text(example):
+def form_training_prompts(example):
     hypothesis = example["hypothesis"]
     premise = example["premise"]
     class_label = ["entailment", "neutral", "contradiction"][example["label"]]
@@ -17,6 +17,20 @@ def form_text(example):
     example["text"] = f"mnli hypothesis: {hypothesis} premise: {premise} target: {class_label}<|endoftext|>"
     return example
 
+def form_validation_prompts(example):
+    hypothesis = example["hypothesis"]
+    premise = example["premise"]
+
+    example["text"] = f"mnli hypothesis: {hypothesis} premise: {premise} target:"
+    return example
+
+
+def prepare_validation_features(dataset, tokenizer):
+    tokenized_examples = []
+    for example in dataset["text"]:
+        tokenized_example = tokenizer.encode(example, return_tensors="pt").squeeze()
+        tokenized_examples.append(tokenized_example)
+    return {"input_ids": tokenized_examples, "label": dataset["label"]}
 
 def extract_class_label(s: str) -> str:
     """Extract a class label from the generated text.
@@ -29,22 +43,6 @@ def extract_class_label(s: str) -> str:
         return s
     else:
         return "unknown"
-
-
-def split_text(example: Dict[str, Any]) -> Dict[str, Any]:
-    partition = example["text"].rpartition(" ")
-    example["prompt_text"] = partition[0]
-    example["class_label"] = partition[2].replace("<|endoftext|>", "")
-    return example
-
-
-def prepare_validation_features(dataset, tokenizer):
-    tokenized_examples = []
-    for example in dataset["prompt_text"]:
-        tokenized_example = tokenizer.encode(example, return_tensors="pt").squeeze()
-        tokenized_examples.append(tokenized_example)
-    return {"input_ids": tokenized_examples}
-
 
 def postprocess_mnli_predictions(generated_sentences):
     labels_to_ids = {"entailment": 0, "neutral": 1, "contradiction": 2, "unknown": -1}
@@ -89,14 +87,14 @@ def concat_and_transpose(items):
     return {k: np.stack(item[k] for item in items) for k in ["input_ids", "labels"]}
 
 
-def prepare_mnli_dataset(config):
+def prepare_train_dataset(config):
     tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-j-6B")
     tokenizer.add_special_tokens({"pad_token": "<|extratoken_1|>"})  # index 50257
 
     dataset = load_dataset("glue", "mnli", split="train")
     dataset = dataset.map(
-        form_text,
-        remove_columns=["hypothesis", "premise", "label", "idx"],
+        form_training_prompts,
+        remove_columns=["hypothesis", "premise", "idx"],
         load_from_cache_file=True,
         desc="Generating text prompt",
     )
