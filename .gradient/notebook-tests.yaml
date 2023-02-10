@@ -12,6 +12,15 @@ gptj-finetuning:
     timeout: 15000
   requirements_file: requirements.txt
 
+
+gptj-finetuning:
+  location: ../gptj-text-generation/
+  generated: true
+  notebook:
+    file: GPTJ-generative-inference.ipynb
+    timeout: 3600
+  requirements_file: requirements.txt
+
 # tutorial-basics-walkthrough:
 #   location: ../learning-PyTorch-on-IPU/basics
 #   generated: true
