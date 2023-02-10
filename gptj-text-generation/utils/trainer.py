@@ -1,4 +1,5 @@
 # Copyright (c) 2023 Graphcore Ltd. All rights reserved.
+from typing import Union
 from functools import reduce
 
 from config import GPTJConfig
@@ -12,23 +13,32 @@ from inference import inference
 from modelling.hf_mapping import load_lm_to_hf
 from typing import Optional, Callable
 from torch.utils.data import Dataset
+from popxl_addons.utils import timer
 
-#TODO proper type hints & doc
+from .setup import xl_hf_config_check
+
+# TODO proper type hints & doc
+
 
 class MNLIFinetuningTrainer:
     def __init__(
         self,
         config: GPTJConfig,
-        pretrained: GPTJForCausalLM,
+        pretrained: Union[GPTJForCausalLM, str],
         dataset: Dataset,
         eval_dataset: Optional[Dataset] = None,
         eval_config: Optional[GPTJConfig] = None,
         tokenizer: Optional = None,
-        metric : Optional = None,
+        metric: Optional = None,
         process_answers_func: Optional[Callable] = None,
     ):
         self.config = config
         self.train_session = finetuning_mnli(config)
+        # hf_model = "EleutherAI/gpt-j-6B"
+        if isinstance(pretrained, str):
+            with timer("Loading HuggingFace model"):
+                pretrained = GPTJForCausalLM.from_pretrained(pretrained)
+        xl_hf_config_check(config, pretrained.config)
         self.pretrained = pretrained
         self.dataset = dataset
 
@@ -47,13 +57,13 @@ class MNLIFinetuningTrainer:
         self,
         eval_dataset: Optional[Dataset] = None,
         eval_config: Optional[GPTJConfig] = None,
-        tokenizer: Optional = None, 
+        tokenizer: Optional = None,
         metric: Optional = None,
         process_answers_func: Optional[Callable] = None,
     ):
         if tokenizer:
             self.tokenizer = tokenizer
-        
+
         assert self.tokenizer is not None, "A tokenizer must be provided for evaluation"
 
         if eval_dataset:
@@ -71,15 +81,13 @@ class MNLIFinetuningTrainer:
         if process_answers_func:
             self.process_answers_func = process_answers_func
 
-
         with self.inference_session:
-            answers = run_validation(self.eval_config, self.inference_session, self.eval_dataset, self.tokenizer)
+            answers = run_validation(self.eval_config, self.inference_session, self.eval_dataset, self.tokenizer, self.train_session)
             formatted_answers = self.process_answers_func(answers)
-   
+
         metrics = metric.compute(predictions=formatted_answers, references=dataset["label"])
         logging.info(metrics)
         return metrics
-
 
     def save_hf_checkpoint(self, hf_ckpt_dir: str, ckpt_load_path: Optional[str] = None) -> GPTJForCausalLM:
         """

@@ -18,7 +18,7 @@ from popxl_addons import timer
 from utils.setup import gptj_config_setup
 from utils.utils import tensor_parallel_input, repeat
 from utils.inference import batch_inference
-from data.mnli_data import form_text, prepare_validation_features, split_text
+from data.mnli_data import form_validation_prompts, prepare_validation_features
 from config import GPTJConfig
 
 
@@ -108,8 +108,7 @@ def main():
     # --- Dataset ---
     dataset = load_dataset("glue", "mnli", split="validation_mismatched")
     dataset = dataset.select(range(config.execution.micro_batch_size))
-    dataset = dataset.map(form_text, remove_columns=["hypothesis", "premise", "label", "idx"])
-    dataset = dataset.map(split_text)
+    dataset = dataset.map(form_validation_prompts, remove_columns=["hypothesis", "premise", "idx"])
     dataset = dataset.map(
         prepare_validation_features,
         batched=True,

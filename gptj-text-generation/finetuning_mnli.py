@@ -443,7 +443,7 @@ def global_norm_reduce(config: GPTJConfig, grad_norm: popxl.Tensor, grads: Named
         ops.add_(grad_norm, grad_reduce_square_add(g, config.execution.loss_scaling))
 
 
-def finetuning_mnli(config: GPTJConfig, no_init: bool = True, optim_state: bool = True) -> TaskSession:
+def finetuning_mnli(config: GPTJConfig, no_init: bool = True) -> TaskSession:
     replicas = config.execution.data_parallel * config.execution.tensor_parallel
     ir = popxl.Ir(replication="popdist" if popdist.isPopdistEnvSet() else replicas)
     assert ir.replication_factor == replicas
@@ -700,7 +700,7 @@ def finetuning_mnli(config: GPTJConfig, no_init: bool = True, optim_state: bool 
             }
         )
 
-        if optim_state:
+        if config.checkpoint.optim_state:
             state = NamedTensors(fwd=fwd_vars, optim=optim_vars)
         else:
             state = NamedTensors(fwd=fwd_vars)

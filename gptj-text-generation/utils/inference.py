@@ -11,6 +11,7 @@ def batch_inference(
     pad_token_id: int = 0,
     output_length: Optional[int] = None,
     micro_batch_size: int = 1,
+    # number_of_dummy_entries: int = 0,
 ) -> List[torch.Tensor]:
     """Runs inference with a fixed micro_batch_size and the generation loop on the host.
         Results are returned in the same order as the dataset.
@@ -30,6 +31,7 @@ def batch_inference(
         pad_token_id (int, optional): token index used for padding. Defaults to 0.
         output_length: Optional[int] = Maximum number of tokens to generate.
         micro_batch_size (int, optional): size of batches. Defaults to 1.
+        number_of_dummy_entries (int): How much of the dataset is dummy data to make up the length of the batch.
 
     Returns:
         List[torch.Tensor]: new generated tokens for each batch, in the same order as the dataset.
@@ -50,10 +52,23 @@ def batch_inference(
         )
 
     # Initialise buffers with start
+    dummy_data = [torch.zeros(()).long() for _ in range(micro_batch_size)]
+    rampdown = False
     dl = iter(dataset)
+    dummy_is = set()
     for i in range(micro_batch_size):
-        data = next(dl)
-        b_len = len(data)
+        try:
+            data = next(dl)
+        # If there is less than one batch worth of data we need to prepare with dummy data.
+        except StopIteration as _:
+            dl = iter(dummy_data)
+            data = next(dl)
+            rampdown = True
+            samples = sample_id
+
+        if rampdown:
+            dummy_is.add(i)
+        b_len = max(sum(data.size()), 1)
         batch[i, :b_len].copy_(data)
         batch_lens[i] = b_len
         batch_ids[i] = sample_id
@@ -63,22 +78,20 @@ def batch_inference(
     axis_0 = torch.arange(0, micro_batch_size).long()
 
     results = {}
-    rampdown = False
-    dummy_data = [torch.zeros(()).long() for _ in range(micro_batch_size)]
-    dummy_is = set()
     while True:
         new_token = next_token_fn(batch, batch_lens)
         # Update
         torch.index_put_(batch, (axis_0, batch_lens), new_token)
         batch_lens += 1
         batch_generated += 1
-        # Yield result if needed
         for i, t in enumerate(new_token):
-            # Should stop?
+            # if a sample in the batch should be terminated (based on EOS, Seq Length or Output length)
+            # the generated text is put in the results and a new sample is drawn for generation
             if i not in dummy_is and should_stop(i, t):
                 results[int(batch_ids[i])] = batch[i, batch_lens[i] - batch_generated[i] : batch_lens[i]].clone()
                 try:
                     data = next(dl)
+                    # When we run out of samples to generate, use dummy data.
                 except StopIteration as _:
                     rampdown = True
                     samples = sample_id
@@ -89,6 +102,7 @@ def batch_inference(
                     dummy_is.add(i)
                     if len(dummy_is) == micro_batch_size:
                         return [results[i] for i in range(samples)]
+                # Put the new sample in the batch
                 b_len = max(sum(data.size()), 1)
                 batch[i, :b_len].copy_(data)
                 batch_lens[i] = b_len

@@ -15,7 +15,7 @@ from popxl.utils import to_numpy
 from popxl_addons.utils import timer
 
 from data.hf_data_utils import group_texts
-from data.mnli_data import form_text, tokenizes_text, concat_and_transpose
+from data.mnli_data import prepare_train_dataset, concat_and_transpose
 from popxl_addons import TaskSession
 from config import GPTJConfig, CONFIG_DIR
 from utils.setup import wandb_init, gptj_fine_tuning_setup
@@ -44,35 +44,7 @@ def overfit(config: GPTJConfig, session: TaskSession):
     with timer("Data preperation"):
         tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-j-6B")
         tokenizer.add_special_tokens({"pad_token": "<|extratoken_1|>"})  # index 50257
-        dataset = load_dataset(
-            "glue",
-            "mnli",
-            split="train",
-        )
-        dataset = dataset.map(
-            form_text,
-            remove_columns=["hypothesis", "premise", "label", "idx"],
-            load_from_cache_file=True,
-            desc="Generating text prompt",
-        )
-        dataset = dataset.map(
-            tokenizes_text(tokenizer),
-            batched=True,
-            batch_size=1000,
-            num_proc=1,
-            remove_columns=dataset.column_names,
-            load_from_cache_file=True,
-            desc="Tokenizing text",
-        )
-        dataset = dataset.map(
-            group_texts(config),
-            batched=True,
-            batch_size=1000,
-            num_proc=1,
-            load_from_cache_file=True,
-            desc="Packing sequences",
-        )
-
+        dataset = prepare_train_dataset(config)
         sampler = DistributedSampler(dataset)
         train_dl = StatefulDataLoader(
             dataset,
