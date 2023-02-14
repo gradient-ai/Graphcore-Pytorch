@@ -11,6 +11,8 @@ import torch
 from tqdm import tqdm
 from datasets import load_dataset, load_metric
 from transformers import AutoTokenizer
+from transformers.models.gptj.modeling_gptj import GPTJForCausalLM
+
 import wandb
 
 from popxl.utils import to_numpy
@@ -23,25 +25,29 @@ from utils.utils import tensor_parallel_input, repeat
 from utils.inference import batch_inference
 from data.mnli_data import form_validation_prompts, prepare_validation_features, postprocess_mnli_predictions
 from config import GPTJConfig
+from modelling.hf_mapping import hf_mapping_lm_tp
 
 
 def unwrap(dl):
     for example in tqdm(dl):
         yield torch.tensor(example["input_ids"], dtype=torch.long)
 
-def run_validation(config: GPTJConfig, session: TaskSession, dataset, tokenizer, trained_session: Optional[TaskSession]=None):
+
+def run_validation(
+    config: GPTJConfig, session: TaskSession, dataset, tokenizer, trained_session: Optional[TaskSession] = None
+):
     """
     The session must be opened before calling run_validation
     Usage:
         with session:
             run_validation(config, session, dataset, tokenizer, labels, checkpoint_path)
     """
-    assert any((config.checkpoint.load, trained_session)), "You must specify a checkpoint to load weights from or a session with a trained state"
-    
     if config.checkpoint.load:
         session.load_checkpoint(config.checkpoint.load)
-    else:
+    elif trained_session:
         session.load_from_session(trained_session)
+
+    # else, it assumes weights have been loaded
 
     labels = dataset["label"]
 
@@ -80,17 +86,15 @@ def main():
     config, args, _ = gptj_config_setup(
         "config/inference.yml", "release", "gpt-j-mnli", hf_model_setup=False, wandb_setup=False
     )
-    assert config.checkpoint.load is not None, "You must specify a checkpoint to load using --load"
-
     # --- Tokenizer ---
     tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-j-6B")
     tokenizer.add_special_tokens({"pad_token": "<|extratoken_1|>"})  # index 50257
 
     # --- Dataset ---
     dataset = load_dataset("glue", "mnli", split="validation_mismatched")
-    dataset = dataset.map(form_validation_prompts,
-                          remove_columns=["hypothesis", "premise", "idx"],
-                          load_from_cache_file=False)
+    dataset = dataset.map(
+        form_validation_prompts, remove_columns=["hypothesis", "premise", "idx"], load_from_cache_file=False
+    )
     dataset = dataset.map(
         prepare_validation_features,
         batched=True,
@@ -109,12 +113,18 @@ def main():
     logging.info(f"Reducing sequence length to {max_len}")
 
     session = inference(config)
+
+    pretrained = GPTJForCausalLM.from_pretrained("Graphcore/gptj-mnli")
+
     with session:
+        with timer("Loading HF Graphcore/gptj-mnli model to IPU"):
+            session.write_variables_data(hf_mapping_lm_tp(config, session, pretrained))
         answers = run_validation(config, session, dataset, tokenizer)
         formatted_answers = postprocess_mnli_predictions(answers)
-   
+
     metrics = metric.compute(predictions=formatted_answers, references=dataset["label"])
     logging.info(metrics)
+
 
 if __name__ == "__main__":
     try:

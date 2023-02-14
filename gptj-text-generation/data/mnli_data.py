@@ -17,6 +17,7 @@ def form_training_prompts(example):
     example["text"] = f"mnli hypothesis: {hypothesis} premise: {premise} target: {class_label}<|endoftext|>"
     return example
 
+
 def form_validation_prompts(example):
     hypothesis = example["hypothesis"]
     premise = example["premise"]
@@ -32,6 +33,7 @@ def prepare_validation_features(dataset, tokenizer):
         tokenized_examples.append(tokenized_example)
     return {"input_ids": tokenized_examples, "label": dataset["label"]}
 
+
 def extract_class_label(s: str) -> str:
     """Extract a class label from the generated text.
     This is done by matching the label as there is often no space between the label and subsequent output."""
@@ -43,6 +45,7 @@ def extract_class_label(s: str) -> str:
         return s
     else:
         return "unknown"
+
 
 def postprocess_mnli_predictions(generated_sentences):
     labels_to_ids = {"entailment": 0, "neutral": 1, "contradiction": 2, "unknown": -1}

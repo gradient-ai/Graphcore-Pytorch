@@ -9,13 +9,13 @@ from finetuning_mnli import finetuning_mnli
 from run_finetuning_mnli import training
 from run_mnli_validation import run_validation
 from inference import inference
+from modelling.hf_mapping import hf_mapping_lm_tp
 
 from modelling.hf_mapping import load_lm_to_hf
 from typing import Optional, Callable
 from torch.utils.data import Dataset
 from popxl_addons.utils import timer
-
-from .setup import xl_hf_config_check
+import logging
 
 # TODO proper type hints & doc
 
@@ -33,23 +33,19 @@ class MNLIFinetuningTrainer:
         process_answers_func: Optional[Callable] = None,
     ):
         self.config = config
-        self.train_session = finetuning_mnli(config)
-        # hf_model = "EleutherAI/gpt-j-6B"
-        if isinstance(pretrained, str):
-            with timer("Loading HuggingFace model"):
-                pretrained = GPTJForCausalLM.from_pretrained(pretrained)
-        xl_hf_config_check(config, pretrained.config)
+        self.train_session = None
         self.pretrained = pretrained
         self.dataset = dataset
 
         self.eval_config = eval_config
         self.tokenizer = tokenizer
         self.eval_dataset = eval_dataset
-        self.inference_session = self.__build_inference_session()
+        self.inference_session = None
         self.metric = metric
         self.process_answers_func = process_answers_func
 
     def train(self):
+        self.train_session = finetuning_mnli(self.config)
         with self.train_session:
             training(self.config, self.train_session, self.pretrained, self.dataset)
 
@@ -60,6 +56,7 @@ class MNLIFinetuningTrainer:
         tokenizer: Optional = None,
         metric: Optional = None,
         process_answers_func: Optional[Callable] = None,
+        use_pretrained: bool = False,
     ):
         if tokenizer:
             self.tokenizer = tokenizer
@@ -76,17 +73,27 @@ class MNLIFinetuningTrainer:
 
         if eval_config:
             self.eval_config = eval_config
-            self.inference_session = self.__build_inference_session()
+
+        self.inference_session = self.__build_inference_session()
 
         if process_answers_func:
             self.process_answers_func = process_answers_func
 
         with self.inference_session:
-            answers = run_validation(self.eval_config, self.inference_session, self.eval_dataset, self.tokenizer, self.train_session)
-            formatted_answers = self.process_answers_func(answers)
+            if (self.train_session is None and self.eval_config.checkpoint.load is None) or use_pretrained:
+                with timer("Loading HF pretrained model to IPU"):
+                    self.inference_session.write_variables_data(
+                        hf_mapping_lm_tp(self.eval_config, self.inference_session, self.pretrained)
+                    )
 
-        metrics = metric.compute(predictions=formatted_answers, references=dataset["label"])
+            self.raw_answers = run_validation(
+                self.eval_config, self.inference_session, self.eval_dataset, self.tokenizer, self.train_session
+            )
+            formatted_answers = self.process_answers_func(self.raw_answers)
+
+        metrics = self.metric.compute(predictions=formatted_answers, references=self.eval_dataset["label"])
         logging.info(metrics)
+
         return metrics
 
     def save_hf_checkpoint(self, hf_ckpt_dir: str, ckpt_load_path: Optional[str] = None) -> GPTJForCausalLM:
