@@ -13,7 +13,7 @@ gptj-finetuning:
   requirements_file: requirements.txt
 
 
-gptj-finetuning:
+gptj-generative-inference:
   location: ../gptj-text-generation/
   generated: true
   notebook:
