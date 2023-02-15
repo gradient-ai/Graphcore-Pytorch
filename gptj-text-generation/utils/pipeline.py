@@ -54,7 +54,7 @@ def encode_for_inference(dataset: datasets.Dataset, tokenizer: AutoTokenizer):
         tokenized_examples.append(tokenized_example)
     return {
         "input_ids": tokenized_examples,
-        "label": [None for _ in range(len(tokenized_examples))],
+        "label": dataset.get("label", [None for _ in range(len(tokenized_examples))]),
     }
 
 
