@@ -10,8 +10,8 @@
 # 3: Version ID
 # 4: Either the runtime in which we are running or 'upload-reports'
 # 5: Folder in which to save/look for tar.gz report archives
-# 6: Examples utils spec file to process
-# 7: Huggingface token
+# 6: Huggingface token
+# @:7 Examples utils spec file to process and benchmark 
 
 upload_report() {
     # Uploads files to a gradient dataset
@@ -37,7 +37,7 @@ run_tests(){
 
     export VIRTUAL_ENV="/some/fake/venv/GC-automated-paperspace-test-${4}"
     LOG_FOLDER="${5}/log_${4}_$(date +'%Y-%m-%d-%H_%M_%S')"
-    TEST_CONFIG_FILE="${6}"
+    TEST_CONFIG_FILE="${@:7}"
     mkdir -p ${LOG_FOLDER}
     cd /notebooks/
     python -m examples_utils platform_assessment --spec ${TEST_CONFIG_FILE} \
@@ -51,7 +51,7 @@ run_tests(){
     echo "PAPERSPACE-AUTOMATED-TESTING: Testing complete"
 }
 # Prep the huggingface token
-export HUGGING_FACE_HUB_TOKEN=${7}
+export HUGGING_FACE_HUB_TOKEN=${6}
 
 python -m pip install "examples-utils[jupyter] @ git+https://github.com/graphcore/examples-utils@a9ffaafab9b77fc9ba41489e3259e251799e0438"
 python -m pip install gradient
