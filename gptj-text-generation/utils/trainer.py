@@ -5,9 +5,9 @@ from functools import reduce
 from config import GPTJConfig
 from transformers.models.gptj import GPTJForCausalLM
 
-from finetuning_mnli import finetuning_mnli
-from run_finetuning_mnli import training
-from run_mnli_validation import run_validation
+from finetuning import finetuning
+from run_finetuning import training
+from run_validation import run_validation
 from inference import inference
 from modelling.hf_mapping import hf_mapping_lm_tp
 
@@ -20,7 +20,7 @@ import logging
 # TODO proper type hints & doc
 
 
-class MNLIFinetuningTrainer:
+class GPTJTrainer:
     def __init__(
         self,
         config: GPTJConfig,
@@ -45,7 +45,7 @@ class MNLIFinetuningTrainer:
         self.process_answers_func = process_answers_func
 
     def train(self):
-        self.train_session = finetuning_mnli(self.config)
+        self.train_session = finetuning(self.config)
         with self.train_session:
             training(self.config, self.train_session, self.pretrained, self.dataset)
 

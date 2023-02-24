@@ -29,7 +29,7 @@ __all__ = ["inference"]
 
 def inference(config: GPTJConfig) -> TaskSession:
     assert config.model.eval, "Eval mode must be True"
-    assert config.execution.data_parallel == 1, "You cant use DP for inference"
+    assert config.execution.data_parallel == 1, "You can't use DP for inference"
     replicas = config.execution.tensor_parallel
     ir = popxl.Ir(replication="popdist" if popdist.isPopdistEnvSet() else replicas)
     assert ir.replication_factor == replicas

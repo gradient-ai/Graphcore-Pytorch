@@ -21,7 +21,7 @@ from config import GPTJConfig, CONFIG_DIR
 from utils.setup import wandb_init, gptj_fine_tuning_setup
 from modelling.hf_mapping import hf_mapping_lm_tp
 
-from finetuning_mnli import finetuning_mnli
+from finetuning import finetuning
 from modelling.embedding import GPTJEmbeddingsTP
 from modelling.gptj_lm import GPTJLMHeadLossAndGradTP
 from data.data_utils import WorkerInit, DistributedSampler, StatefulDataLoader
@@ -41,7 +41,7 @@ def overfit(config: GPTJConfig, session: TaskSession):
     n_shards = config.execution.tensor_parallel
     samples_per_step = config.execution.device_iterations * config.training.global_batch_size
 
-    with timer("Data preperation"):
+    with timer("Data preparation"):
         tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-j-6B")
         tokenizer.add_special_tokens({"pad_token": "<|extratoken_1|>"})  # index 50257
         dataset = prepare_train_dataset(config)
@@ -120,9 +120,7 @@ def overfit(config: GPTJConfig, session: TaskSession):
 
 def main():
     # Configuration
-    config, args, pretrained = gptj_fine_tuning_setup(
-        CONFIG_DIR / "finetuning_mnli.yml", "release", "gptj_6B_1024_pod64"
-    )
+    config, args, pretrained = gptj_fine_tuning_setup(CONFIG_DIR / "finetuning.yml", "release", "gptj_6B_1024_pod64")
 
     config.training.steps = 100
     config.training.optimizer.learning_rate.maximum = 0.0001
@@ -130,10 +128,10 @@ def main():
 
     # Create the training session
     if config.checkpoint.load or pretrained:
-        session = finetuning_mnli(config)
+        session = finetuning(config)
     else:
         # initialise weights from scratch
-        session = finetuning_mnli(config, no_init=False)
+        session = finetuning(config, no_init=False)
 
     # Load checkpoint/ HF weights
     if config.checkpoint.load is not None:

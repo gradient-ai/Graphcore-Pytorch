@@ -31,6 +31,8 @@ from data import mnli_data
 import popart
 import popxl
 
+from . import trainer
+
 
 class BasicPipeline:
     @abc.abstractmethod
@@ -58,26 +60,43 @@ def encode_for_inference(dataset: datasets.Dataset, tokenizer: AutoTokenizer):
     }
 
 
-class IPUGPTJPipeline(BasicPipeline):
+class GPTJPipeline(BasicPipeline):
     def __init__(
         self,
         config: GPTJConfig,
-        hf_gptj_checkpoint: str,
+        hf_gptj_checkpoint: Union[str, GPTJForCausalLM],
         *args,
         sequence_length=None,
-        output_length=128,
-        print_live=False,
+        micro_batch_size=None,
+        output_length=20,
+        print_live=True,
+        tokenizer: Optional[AutoTokenizer] = None,
         **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         if sequence_length is not None:
             config.model.sequence_length = sequence_length
+        if micro_batch_size is not None:
+            config.execution.micro_batch_size = micro_batch_size
+        if output_length is not None:
+            config.inference.output_length = output_length
 
         logging.info(f"Creating session")
         session: popxl.Session = inference(config)
-        logging.info(f"Downloading '{hf_gptj_checkpoint}' pretrained weights and tokenizer")
-        hf_model = GPTJForCausalLM.from_pretrained(hf_gptj_checkpoint)
-        tokenizer = AutoTokenizer.from_pretrained(hf_gptj_checkpoint)
+        if isinstance(hf_gptj_checkpoint, str):
+            logging.info(f"Downloading '{hf_gptj_checkpoint}' pretrained weights")
+            hf_model = GPTJForCausalLM.from_pretrained(hf_gptj_checkpoint)
+            if tokenizer is None:
+                logging.info(f"Downloading '{hf_gptj_checkpoint}' tokenizer")
+                tokenizer = AutoTokenizer.from_pretrained(hf_gptj_checkpoint)
+        else:
+            hf_model = hf_gptj_checkpoint
+        if tokenizer is None:
+            raise ValueError(
+                "Tokenizer needs to be passed to the Pipeline if a custom checkpoint is being provided."
+                "Use: AutoTokenizer.from_pretrained(model-name) to create the tokenizer."
+            )
+
         tokenizer.add_special_tokens({"pad_token": "<|extratoken_1|>"})
 
         if config.model.dtype == popxl.float16:
@@ -86,7 +105,7 @@ class IPUGPTJPipeline(BasicPipeline):
             weights = hf_mapping_lm_tp(config, session, hf_model)
             session.write_variables_data(weights)
         self.tokenizer = tokenizer
-        self.model = hf_model
+        self.pretrained = hf_model
         self.config = config
         self.session = session
         self.output_length = output_length
@@ -104,17 +123,7 @@ class IPUGPTJPipeline(BasicPipeline):
         data_map[self.session.inputs.last_token_indices] = repeat(lengths - 1, tp, axis=0)
         # identical for all tp, take first
         next_token_id = self.session.run(data_map)[self.session.outputs.next_token][0]
-        # find if the termination string was encountered and replace it with the end of string
-        # token of the tokenizer
-        if self._termination_token is not None:
-            shape = self._termination_token.shape[0]
-            for i, (input_, length) in enumerate(zip(inputs, lengths)):
-                if shape > length or shape > len(input_):
-                    continue
-                if (input_[length - shape + 1 : length] == self._termination_token[:-1]).all() and next_token_id[
-                    i
-                ] == self._termination_token[-1]:
-                    next_token_id[i] = self.tokenizer.eos_token_id
+
         if self.print_live:
             print(self.tokenizer.decode(next_token_id[0]), end="")
         return torch.LongTensor(next_token_id)
@@ -125,7 +134,6 @@ class IPUGPTJPipeline(BasicPipeline):
         *args,
         output_length: Optional[int] = None,
         print_live: Optional[bool] = None,
-        terminate_on_string: Optional[str] = None,
     ):
         super().__call__(prompt)
         if print_live is not None:
@@ -153,10 +161,7 @@ class IPUGPTJPipeline(BasicPipeline):
         logging.info("Start inference")
         if self.print_live:
             print(f"Prompt: '{prompt[0] if isinstance(prompt, list) else prompt[0]['text']}'", end="")
-        if terminate_on_string:
-            self._termination_token = encode_for_inference({"text": [terminate_on_string]}, self.tokenizer)[
-                "input_ids"
-            ][0].squeeze()
+
         answers = batch_inference(
             unwrap(data),
             self.next_token,
@@ -185,12 +190,31 @@ class IPUGPTJPipeline(BasicPipeline):
             self.session._set_device(was_attached_or_device)
 
     @classmethod
-    def from_gptj_pipeline(cls, other: "IPUGPTJPipeline"):
+    def from_trainer(cls, trainer: trainer.GPTJTrainer):
+        """"""
+        if trainer.inference_session is not None:
+            new_pipeline = cls.__new__(cls)
+            new_pipeline.tokenizer = trainer.tokenizer
+            new_pipeline.pretrained = trainer.pretrained
+            new_pipeline.config = trainer.eval_config
+            new_pipeline.session = trainer.inference_session
+            new_pipeline.output_length = trainer.eval_config.inference.output_length
+            new_pipeline.print_live = True
+            new_pipeline._termination_token = None
+        elif trainer.train_session is not None:
+            raise NotImplementedError("Cannot create Pipeline from training session only")
+        else:
+            raise NotImplementedError("Cannot create from uninitialised pipeline")
+
+        return new_pipeline
+
+    @classmethod
+    def from_gptj_pipeline(cls, other: "GPTJPipeline"):
         """Create a new pipeline with the same model, config, tokenizer and session
         This can be used to quickly reuse the GPTJ session and IPU for a different task"""
         new_pipeline = cls.__new__(cls)
         new_pipeline.tokenizer = other.tokenizer
-        new_pipeline.model = other.model
+        new_pipeline.pretrained = other.pretrained
         new_pipeline.config = other.config
         new_pipeline.session = other.session
         new_pipeline.output_length = other.output_length
@@ -199,7 +223,7 @@ class IPUGPTJPipeline(BasicPipeline):
         return new_pipeline
 
 
-class GPTJEntailmentPipeline(IPUGPTJPipeline):
+class GPTJEntailmentPipeline(GPTJPipeline):
     """A generative pipeline for"""
 
     def __call__(
@@ -208,7 +232,7 @@ class GPTJEntailmentPipeline(IPUGPTJPipeline):
         hypothesis: Union[str, List[str]],
         *args,
         output_length: Optional[int] = 10,
-        print_live: bool = True,
+        print_live: Optional[bool] = None,
         **kwargs,
     ):
         data = datasets.Dataset.from_dict(
@@ -221,7 +245,6 @@ class GPTJEntailmentPipeline(IPUGPTJPipeline):
             mnli_data.form_validation_prompts,
             remove_columns=data.column_names,
         )
-        print(len(data))
         self.raw_out = super().__call__(data, *args, output_length=output_length, print_live=print_live, **kwargs)
         find_eos = re.compile(re.escape(self.tokenizer.eos_token))
         processed = []

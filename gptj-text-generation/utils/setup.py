@@ -120,7 +120,7 @@ def gptj_config_setup(
 def gptj_fine_tuning_setup(
     config_file: Union[str, Path], presets_key: str, default_config: str, wandb_setup: bool = False
 ) -> Tuple[GPTJConfig, argparse.Namespace, Optional[GPTJForCausalLM]]:
-    """GPT-J setup for fine tunning scripts"""
+    """GPT-J setup for finetuning scripts"""
     config, args, pretrained = gptj_config_setup(
         config_file, presets_key, default_config, wandb_setup=wandb_setup, hf_model_setup=True
     )

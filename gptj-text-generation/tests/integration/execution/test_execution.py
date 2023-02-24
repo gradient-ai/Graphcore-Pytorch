@@ -14,9 +14,9 @@ def gptj_root_env_path():
 
 
 class TestPretraining(SubProcessChecker):
-    def test_finetuning_mnli(self):
+    def test_finetuning(self):
         self.run_command(
-            "python3 finetuning_mnli.py --config tiny --layers 3 "
+            "python3 finetuning.py --config tiny --layers 3 "
             "--global_batch_size 16 --micro_batch_size 2 --data_parallel 2 --tensor_parallel 2 "
             "--vocab_size 128 --sequence_length 8 --rotary_dim 16 "
             "--hidden_size 64 --heads 4",

@@ -11,7 +11,6 @@ def batch_inference(
     pad_token_id: int = 0,
     output_length: Optional[int] = None,
     micro_batch_size: int = 1,
-    # number_of_dummy_entries: int = 0,
 ) -> List[torch.Tensor]:
     """Runs inference with a fixed micro_batch_size and the generation loop on the host.
         Results are returned in the same order as the dataset.
@@ -31,7 +30,6 @@ def batch_inference(
         pad_token_id (int, optional): token index used for padding. Defaults to 0.
         output_length: Optional[int] = Maximum number of tokens to generate.
         micro_batch_size (int, optional): size of batches. Defaults to 1.
-        number_of_dummy_entries (int): How much of the dataset is dummy data to make up the length of the batch.
 
     Returns:
         List[torch.Tensor]: new generated tokens for each batch, in the same order as the dataset.
