@@ -311,7 +311,7 @@ Let's set our training hyperparameters using `IPUTrainingArguments`.
 This subclasses the Hugging Face `TrainingArguments` class, adding parameters specific to the IPU and its execution characteristics.
 """
 training_args = optimum_graphcore.IPUTrainingArguments(
-    output_dir="./results",
+    output_dir=".graphcore/vit-model",
     overwrite_output_dir=True,
     per_device_train_batch_size=1,
     per_device_eval_batch_size=1,
