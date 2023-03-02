@@ -68,7 +68,7 @@ import transformers
 import datasets
 
 # The `chest-xray-nihcc` directory is assumed to be in the pwd, but may be overridden by the environment variable `DATASET_DIR`
-dataset_rootdir = Path(os.environ.get("DATASET_DIR", ".")) / "chest-xray-nihcc"
+dataset_rootdir = Path(os.environ.get("DATASET_DIR", ".")) / "chest-xray-nihcc-3"
 
 # sst_hide_output"
 """
