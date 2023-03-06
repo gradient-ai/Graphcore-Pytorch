@@ -29,7 +29,7 @@ apt install -o DPkg::Lock::Timeout=120 -y psmisc libfuse3-dev fuse-overlayfs
 
 echo "Starting preparation of datasets"
 # symlink exe_cache files
-exe_cache_source_dir="${PUBLIC_DATASET_DIR}/poplar-executables-pytorch-3-1"
+exe_cache_source_dir="${PUBLIC_DATASET_DIR}/poplar-executables-pytorch-3-1-1"
 symlink-public-resources "${exe_cache_source_dir}" $POPLAR_EXECUTABLE_CACHE_DIR
 # Symlink squad
 symlink-public-resources "${PUBLIC_DATASET_DIR}/squad" "${HF_DATASETS_CACHE}/squad"
