@@ -83,22 +83,22 @@ vit-model-training:
 
 # GNN team testing separately
 get-started-PyG-SchNetGNN:
-   location: ../schnet-graph-network
-   generated: true
-   notebook:
-     file: PyG-SchNetGNN.ipynb
-     timeout: 3600
-   requirements_file: requirements-pyg.txt
+  location: ../schnet-graph-network
+  generated: true
+  notebook:
+    file: PyG-SchNetGNN.ipynb
+    timeout: 3600
+  requirements_file: requirements-pyg.txt
 
 
 
 # Useful references
 useful-managing-ipu-resources:
-   location: ../useful-tips
-   generated: true
-   notebook:
-     file: managing_ipu_resources.ipynb
-     timeout: 1000
+  location: ../useful-tips
+  generated: true
+  notebook:
+    file: managing_ipu_resources.ipynb
+    timeout: 1000
 
 # examples_repository_options: &examples_repository_options
 #   repository:
