@@ -1,68 +1,68 @@
-# Graphcore-Pytorch-README_first:
-#   location: ../
-#   generated: true
-#   notebook:
-#     file: README_first.ipynb
+Graphcore-Pytorch-README_first:
+  location: ../
+  generated: true
+  notebook:
+    file: README_first.ipynb
 
-# tutorial-basics-walkthrough:
-#   location: ../learning-PyTorch-on-IPU/basics
-#   generated: true
-#   notebook:
-#     file: walkthrough.ipynb
-#     timeout: 1200
-#   requirements_file: requirements.txt
-
-
-# efficient_data_loading-walkthrough:
-#   location: ../learning-PyTorch-on-IPU/efficient_data_loading
-#   generated: true
-#   notebook:
-#     file: walkthrough.ipynb
-#     timeout: 1200
+tutorial-basics-walkthrough:
+  location: ../learning-PyTorch-on-IPU/basics
+  generated: true
+  notebook:
+    file: walkthrough.ipynb
+    timeout: 1200
+  requirements_file: requirements.txt
 
 
-# mixed_precision-walkthrough:
-#   location: ../learning-PyTorch-on-IPU/mixed_precision
-#   generated: true
-#   notebook:
-#     file: walkthrough.ipynb
-#     timeout: 1200
-#   requirements_file: requirements.txt
+efficient_data_loading-walkthrough:
+  location: ../learning-PyTorch-on-IPU/efficient_data_loading
+  generated: true
+  notebook:
+    file: walkthrough.ipynb
+    timeout: 1200
 
 
-# pipelining-walkthrough:
-#   location: ../learning-PyTorch-on-IPU/pipelining
-#   generated: true
-#   notebook:
-#     file: walkthrough.ipynb
-#     timeout: 1200
-#   requirements_file: requirements.txt
+mixed_precision-walkthrough:
+  location: ../learning-PyTorch-on-IPU/mixed_precision
+  generated: true
+  notebook:
+    file: walkthrough.ipynb
+    timeout: 1200
+  requirements_file: requirements.txt
 
 
-# finetuning-bert:
-#   location: ../finetuning-bert
-#   generated: true
-#   notebook:
-#     file: Fine-tuning-BERT.ipynb
-#     timeout: 10000
-#   requirements_file: requirements.txt
-
-# tgn:
-#   location: ../temporal-graph-networks
-#   generated: true
-#   notebook:
-#     file: Train_TGN.ipynb
-#     timeout: 10000
-#   requirements_file: requirements.txt
+pipelining-walkthrough:
+  location: ../learning-PyTorch-on-IPU/pipelining
+  generated: true
+  notebook:
+    file: walkthrough.ipynb
+    timeout: 1200
+  requirements_file: requirements.txt
 
 
-# distributed-kge:
-#   location: ../distributed-kge
-#   generated: true
-#   notebook:
-#     file: KgeModelling.ipynb
-#     timeout: 10000
-#   requirements_file: requirements.txt
+finetuning-bert:
+  location: ../finetuning-bert
+  generated: true
+  notebook:
+    file: Fine-tuning-BERT.ipynb
+    timeout: 10000
+  requirements_file: requirements.txt
+
+tgn:
+  location: ../temporal-graph-networks
+  generated: true
+  notebook:
+    file: Train_TGN.ipynb
+    timeout: 10000
+  requirements_file: requirements.txt
+
+
+distributed-kge:
+  location: ../distributed-kge
+  generated: true
+  notebook:
+    file: KgeModelling.ipynb
+    timeout: 10000
+  requirements_file: requirements.txt
 
 # Removed pending model work
 # gpt2-textgen:
@@ -82,23 +82,23 @@ vit-model-training:
   requirements_file: requirements.txt
 
 # GNN team testing separately
-# get-started-PyG-SchNetGNN:
-#   location: ../schnet-graph-network
-#   generated: true
-#   notebook:
-#     file: PyG-SchNetGNN.ipynb
-#     timeout: 3600
-#   requirements_file: requirements-pyg.txt
+get-started-PyG-SchNetGNN:
+   location: ../schnet-graph-network
+   generated: true
+   notebook:
+     file: PyG-SchNetGNN.ipynb
+     timeout: 3600
+   requirements_file: requirements-pyg.txt
 
 
 
 # Useful references
-# useful-managing-ipu-resources:
-#   location: ../useful-tips
-#   generated: true
-#   notebook:
-#     file: managing_ipu_resources.ipynb
-#     timeout: 1000
+useful-managing-ipu-resources:
+   location: ../useful-tips
+   generated: true
+   notebook:
+     file: managing_ipu_resources.ipynb
+     timeout: 1000
 
 # examples_repository_options: &examples_repository_options
 #   repository:
