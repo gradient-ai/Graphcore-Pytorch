@@ -1,22 +1,30 @@
-#!/bin/bash
+#! /usr/bin/env bash
+set -u
+set -o pipefail
 
 symlink-public-resources() {
     public_source_dir=${1}
     target_dir=${2}
 
     # need to wait until the dataset has been mounted (async on Paperspace's end)
-    COUNTER=0
-    # set a timeout of 300s/5m for the while loop as a safety measure
-    while [ $COUNTER -lt 300 ] && ( [ ! -d ${public_source_dir} ] || [ -z "$(ls -A ${public_source_dir})" ] )
+    # we check that the dataset dir exists and is populated/non-empty
+    # set a timeout of 300s/5m for the loop as a safety measure
+    local -i COUNTER=0
+    until (( COUNTER == 300 )) ||
+            [[ -d "${public_source_dir}" && (( $(
+                find "${public_source_dir}" -mindepth 1 -maxdepth 1 -print | wc -l
+            ) > 0 )) ]]
     do
         echo "Waiting for dataset "${public_source_dir}" to be mounted..."
         sleep 1
         ((COUNTER++))
-        if [ $COUNTER -eq 300 ]; then
-            echo "Warning! Abandoning symlink - source Dataset ${public_source_dir} has not been mounted & populated after 5m."
-            return
-        fi
     done
+
+    # exit the function if the dataset doesn't exit
+    if (( COUNTER == 300 )); then
+        echo "Warning! Abandoning symlink - source Dataset ${public_source_dir} has not been mounted & populated after 5m."
+        return 1
+    fi
 
     echo "Symlinking - ${public_source_dir} to ${target_dir}"
 
@@ -54,8 +62,8 @@ python -m pip install "optimum-graphcore>=0.5, <0.6"
 
 echo "Finished running setup.sh."
 # Run automated test if specified
-if [[ "$1" == "test" ]]; then
+if [[ "${1:-}" == "test" ]]; then
     bash /notebooks/.gradient/automated-test.sh "${@:2}"
-elif [[ "$2" == "test" ]]; then
+elif [[ "${2:-}" == "test" ]]; then
     bash /notebooks/.gradient/automated-test.sh "${@:3}"
 fi
