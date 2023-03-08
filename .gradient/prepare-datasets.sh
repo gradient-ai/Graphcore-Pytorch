@@ -14,6 +14,7 @@ symlink-public-resources() {
         ((COUNTER++))
         if [ $COUNTER -eq 300 ]; then
             echo "Warning! Abandoning symlink - source Dataset ${public_source_dir} has not been mounted & populated after 5m."
+            return
         fi
     done
 
