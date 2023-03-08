@@ -12,6 +12,9 @@ symlink-public-resources() {
         echo "Waiting for dataset "${public_source_dir}" to be mounted..."
         sleep 1
         ((COUNTER++))
+        if [ $COUNTER -eq 300 ]; then
+            echo "Warning! Abandoning symlink - source Dataset ${public_source_dir} has not been mounted & populated after 5m."
+        fi
     done
 
     echo "Symlinking - ${public_source_dir} to ${target_dir}"
