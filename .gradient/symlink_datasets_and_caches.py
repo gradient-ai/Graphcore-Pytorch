@@ -25,7 +25,7 @@ for target_dir, source_dirs_list in config.items():
             COUNTER += 1
 
         if COUNTER == 300:
-            print(f"Abandoning symlink! - source Dataset ${source_dir} has not been mounted & populated after 5 minutes.")
+            print(f"Abandoning symlink! - source dataset {source_dir} has not been mounted & populated after 5 minutes.")
             break
         else:
             print(f"Found dataset {source_dir}")
