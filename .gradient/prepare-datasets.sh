@@ -11,7 +11,7 @@ fi
 
 echo "Starting preparation of datasets"
 cd "$(dirname "$0")"
-python ./symlink_datasets_and_caches.py
+python -u ./symlink_datasets_and_caches.py
 cd -
 
 # pre-install the correct version of optimum for this release
