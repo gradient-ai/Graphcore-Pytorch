@@ -1,9 +1,7 @@
 import json
 import time
 from pathlib import Path
-import warnings
 import subprocess
-import logging
 
 
 # read in symlink config file
@@ -21,25 +19,21 @@ for target_dir, source_dirs_list in config.items():
         COUNTER = 0
         source_dir_path = Path(source_dir)
         while (COUNTER < 300) and (not source_dir_path.exists() or not any(source_dir_path.iterdir())): 
-            #print(f"Waiting for dataset {source_dir_path.as_posix()} to be mounted...")
-            logging.info(f"Waiting for dataset {source_dir_path.as_posix()} to be mounted...")
+            print(f"Waiting for dataset {source_dir_path.as_posix()} to be mounted...")
             time.sleep(1)
             COUNTER += 1
 
         if COUNTER == 300:
-            #print(f"Abandoning symlink! - source dataset {source_dir} has not been mounted & populated after 5 minutes.")
-            logging.info(f"Abandoning symlink! - source dataset {source_dir} has not been mounted & populated after 5 minutes.")
+            print(f"Abandoning symlink! - source dataset {source_dir} has not been mounted & populated after 5 minutes.")
             break
         else:
-            #print(f"Found dataset {source_dir}")
-            logging.info(f"Found dataset {source_dir}")
+            print(f"Found dataset {source_dir}")
             source_dirs_exist_paths.append(source_dir)
     
     # create overlays for source dataset dirs 
     if len(source_dirs_exist_paths) > 0:
-        #print(f"Symlinking - {source_dirs_exist_paths} to {target_dir}")
-        #print("-" * 100)
-        logging.info(f"Symlinking - {source_dirs_exist_paths} to {target_dir}")
+        print(f"Symlinking - {source_dirs_exist_paths} to {target_dir}")
+        print("-" * 100)
 
         Path(target_dir).mkdir(parents=True, exist_ok=True)
 
