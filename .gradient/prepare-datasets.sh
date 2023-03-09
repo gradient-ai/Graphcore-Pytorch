@@ -10,10 +10,9 @@ then
 fi
 
 echo "Starting preparation of datasets"
-python symlink_datasets_and_caches.py
-
-# symlink local dataset used by vit-model-training notebook
-# symlink-public-resources "${PUBLIC_DATASET_DIR}/chest-xray-nihcc" "${DATASET_DIR}/chest-xray-nihcc"
+cd "$(dirname "$0")"
+python ./symlink_datasets_and_caches.py
+cd -
 
 # pre-install the correct version of optimum for this release
 python -m pip install "optimum-graphcore>=0.5, <0.6"
