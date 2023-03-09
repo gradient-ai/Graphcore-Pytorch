@@ -28,6 +28,7 @@ for target_dir, source_dirs_list in config.items():
             warnings.warn(f"Abandoning symlink! - source Dataset ${source_dir} has not been mounted & populated after 5 minutes.")
             break
         else:
+            print(f"Found dataset {source_dir}")
             source_dirs_exist_paths.append(source_dir)
     
     # create overlays for source dataset dirs 
