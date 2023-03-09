@@ -45,6 +45,5 @@ for target_dir, source_dirs_list in config.items():
 
         lowerdirs = ":".join(source_dirs_exist_paths)
         overlay_command = f"fuse-overlayfs -o lowerdir={lowerdirs},upperdir={upperdir_path.as_posix()},workdir={workdir_path.as_posix()} {target_dir}"
-        print(overlay_command)
         subprocess.run(overlay_command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
