@@ -1,27 +1,6 @@
-#!/bin/bash
-
-symlink-public-resources() {
-    public_source_dir=${1}
-    target_dir=${2}
-
-    # need to wait until the dataset has been mounted (async on Paperspace's end)
-    while [ ! -d ${public_source_dir} ] || [ -z "$(ls -A ${public_source_dir})" ]
-    do
-        echo "Waiting for dataset "${public_source_dir}" to be mounted..."
-        sleep 1
-    done
-
-    echo "Symlinking - ${public_source_dir} to ${target_dir}"
-
-    # Make sure it exists otherwise you'll copy your current dir
-    mkdir -p ${target_dir}
-    workdir="/fusedoverlay/workdirs/${public_source_dir}"
-    upperdir="/fusedoverlay/upperdir/${public_source_dir}"
-    mkdir -p ${workdir}
-    mkdir -p ${upperdir}
-    fuse-overlayfs -o lowerdir=${public_source_dir},upperdir=${upperdir},workdir=${workdir} ${target_dir}
-
-}
+#! /usr/bin/env bash
+set -u 
+set -o pipefail
 
 if [ ! "$(command -v fuse-overlayfs)" ]
 then
@@ -31,13 +10,7 @@ then
 fi
 
 echo "Starting preparation of datasets"
-# symlink exe_cache files
-exe_cache_source_dir="${PUBLIC_DATASET_DIR}/poplar-executables-pytorch-3-1"
-symlink-public-resources "${exe_cache_source_dir}" $POPLAR_EXECUTABLE_CACHE_DIR
-# Symlink squad
-symlink-public-resources "${PUBLIC_DATASET_DIR}/squad" "${HF_DATASETS_CACHE}/squad"
-# Symlink OGB Wiki dataset and checkpoint
-symlink-public-resources "${PUBLIC_DATASET_DIR}/ogbl_wikikg2_custom" "${DATASET_DIR}/ogbl_wikikg2_custom"
+python symlink_datasets_and_caches.py
 
 # symlink local dataset used by vit-model-training notebook
 # symlink-public-resources "${PUBLIC_DATASET_DIR}/chest-xray-nihcc" "${DATASET_DIR}/chest-xray-nihcc"
