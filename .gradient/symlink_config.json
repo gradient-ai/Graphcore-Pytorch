@@ -1,5 +1,5 @@
 {
-    "/tmp/exe_cache":["/datasets/poplar-executables-pytorch-3-1", "/datasets/poplar-executables-hf-3-1", "/datasets/non-existent-dataset"],
+    "/tmp/exe_cache":["/datasets/poplar-executables-pytorch-3-1"],
     "/tmp/huggingface_caches/datasets/squad":["/datasets/squad"],
     "/tmp/dataset_cache/ogbl_wikikg2_custom":["/datasets/ogbl_wikikg2_custom"]
 }
