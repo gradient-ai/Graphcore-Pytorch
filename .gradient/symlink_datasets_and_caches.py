@@ -37,9 +37,9 @@ for target_dir, source_dirs_list in config.items():
 
         Path(target_dir).mkdir(parents=True, exist_ok=True)
 
-        workdir_path = Path("/nethome/rahult/caches/fusedoverlay/workdirs" + target_dir)
+        workdir_path = Path("/fusedoverlay/workdirs" + target_dir)
         workdir_path.mkdir(parents=True, exist_ok=True)
-        upperdir_path = Path("/nethome/rahult/caches/fusedoverlay/upperdir" + target_dir) 
+        upperdir_path = Path("/fusedoverlay/upperdir" + target_dir) 
         upperdir_path.mkdir(parents=True, exist_ok=True)
 
         lowerdirs = ":".join(source_dirs_exist_paths)
