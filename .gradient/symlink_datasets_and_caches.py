@@ -19,7 +19,7 @@ for target_dir, source_dirs_list in config.items():
         # 300s/5m timeout for waiting for the dataset
         keep_waiting = ( (COUNTER < 300) 
                           # wait for the dataset to exist and be populated/non-empty
-                          and not (source_dir_path.exits() and any(source_dir_path.iterdir())) )
+                          and not (source_dir_path.exists() and any(source_dir_path.iterdir())) )
         while keep_waiting: 
             print(f"Waiting for dataset {source_dir_path.as_posix()} to be mounted...")
             time.sleep(1)
