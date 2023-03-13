@@ -16,16 +16,13 @@ for target_dir, source_dirs_list in config.items():
     for source_dir in source_dirs_list:
         source_dir_path = Path(source_dir)
         COUNTER = 0
-        # 300s/5m timeout for waiting for the dataset
-        keep_waiting = ( (COUNTER < 300) 
-                          # wait for the dataset to exist and be populated/non-empty
-                          and not (source_dir_path.exists() and any(source_dir_path.iterdir())) )
-        while keep_waiting: 
+        # wait until the dataset exists and is populated/non-empty, with a 300s/5m timeout
+        while (COUNTER < 300) and (not source_dir_path.exists() or not any(source_dir_path.iterdir())):
             print(f"Waiting for dataset {source_dir_path.as_posix()} to be mounted...")
             time.sleep(1)
             COUNTER += 1
 
-        # dataset doesn't exist after 300s, skip it
+        # dataset doesn't exist after 300s, so skip it
         if COUNTER == 300:
             print(f"Abandoning symlink! - source dataset {source_dir} has not been mounted & populated after 5 minutes.")
             break
