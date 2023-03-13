@@ -1,5 +1,5 @@
 {
-    "/tmp/exe_cache":["/datasets/poplar-executables-pytorch-3-1"],
-    "/tmp/huggingface_caches/datasets/squad":["/datasets/squad"],
-    "/tmp/dataset_cache/ogbl_wikikg2_custom":["/datasets/ogbl_wikikg2_custom"]
+    "$POPLAR_EXECUTABLE_CACHE_DIR":["${PUBLIC_DATASET_DIR}/poplar-executables-pytorch-3-1"],
+    "${HF_DATASETS_CACHE}/squad":["${PUBLIC_DATASET_DIR}/squad"],
+    "${DATASET_DIR}/ogbl_wikikg2_custom":["${PUBLIC_DATASET_DIR}/ogbl_wikikg2_custom"]
 }

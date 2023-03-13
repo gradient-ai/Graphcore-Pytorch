@@ -2,11 +2,17 @@ import json
 import time
 from pathlib import Path
 import subprocess
+import os
 
 
 # read in symlink config file
 with open(f"{Path(__file__).parent.absolute().as_posix()}/symlink_config.json", "r") as f:
-    config = json.loads(f.read())
+    json_data = f.read()
+
+# substitute environment variables in the JSON data
+json_data = os.path.expandvars(json_data)
+# parse the json data
+config = json.loads(json_data)
 
 # loop through each key-value pair
 # the key is the target directory, the value is a list of source directories
