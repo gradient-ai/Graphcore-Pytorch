@@ -12,17 +12,20 @@ with open(f"{Path(__file__).parent.absolute().as_posix()}/symlink_config.json", 
 # the key is the target directory, the value is a list of source directories
 for target_dir, source_dirs_list in config.items():
     # need to wait until the dataset has been mounted (async on Paperspace's end)
-    # we check that the source dataset dir exists and is populated/non-empty
-    # set a timeout of 300s/5m for the loop as a safety measure
     source_dirs_exist_paths = []
     for source_dir in source_dirs_list:
-        COUNTER = 0
         source_dir_path = Path(source_dir)
-        while (COUNTER < 300) and (not source_dir_path.exists() or not any(source_dir_path.iterdir())): 
+        COUNTER = 0
+        # 300s/5m timeout for waiting for the dataset
+        keep_waiting = ( (COUNTER < 300) 
+                          # wait for the dataset to exist and be populated/non-empty
+                          and not (source_dir_path.exits() and any(source_dir_path.iterdir())) )
+        while keep_waiting: 
             print(f"Waiting for dataset {source_dir_path.as_posix()} to be mounted...")
             time.sleep(1)
             COUNTER += 1
 
+        # dataset doesn't exist after 300s, skip it
         if COUNTER == 300:
             print(f"Abandoning symlink! - source dataset {source_dir} has not been mounted & populated after 5 minutes.")
             break
