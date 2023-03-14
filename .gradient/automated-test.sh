@@ -56,7 +56,7 @@ run_tests(){
 # Prep the huggingface token
 export HUGGING_FACE_HUB_TOKEN=${7}
 if [ "${8}" == "unset" ]; then
-    EXAMPLES_UTILS_REV=latest_stable
+    EXAMPLES_UTILS_REV="latest_stable"
 else
     EXAMPLES_UTILS_REV=${8}
 fi
