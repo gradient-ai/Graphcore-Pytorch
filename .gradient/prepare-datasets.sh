@@ -36,6 +36,9 @@ echo "Starting preparation of datasets"
 # symlink exe_cache files
 exe_cache_source_dir="${PUBLIC_DATASET_DIR}/poplar-executables-pytorch-3-1"
 symlink-public-resources "${exe_cache_source_dir}" $POPLAR_EXECUTABLE_CACHE_DIR
+
+gptj_cache_source_dir="${PUBLIC_DATASET_DIR}/gptj_exe_cache"
+symlink-public-resources "${gptj_cache_source_dir}" "$POPLAR_EXECUTABLE_CACHE_DIR/gptj"
 # Symlink squad
 symlink-public-resources "${PUBLIC_DATASET_DIR}/squad" "${HF_DATASETS_CACHE}/squad"
 # Symlink OGB Wiki dataset and checkpoint
