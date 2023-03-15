@@ -1,8 +1,8 @@
-#Graphcore-Pytorch-README_first:
-#  location: ../
-#  generated: true
-#  notebook:
-#    file: README_first.ipynb
+Graphcore-Pytorch-README_first:
+ location: ../
+ generated: true
+ notebook:
+   file: README_first.ipynb
 
 gptj-finetuning:
   location: ../gptj-text-generation/
@@ -21,48 +21,48 @@ gptj-generative-inference:
     timeout: 3600
   requirements_file: requirements.txt
 
-# tutorial-basics-walkthrough:
-#   location: ../learning-PyTorch-on-IPU/basics
-#   generated: true
-#   notebook:
-#     file: walkthrough.ipynb
-#     timeout: 1200
-#   requirements_file: requirements.txt
+tutorial-basics-walkthrough:
+  location: ../learning-PyTorch-on-IPU/basics
+  generated: true
+  notebook:
+    file: walkthrough.ipynb
+    timeout: 1200
+  requirements_file: requirements.txt
 
 
-# efficient_data_loading-walkthrough:
-#   location: ../learning-PyTorch-on-IPU/efficient_data_loading
-#   generated: true
-#   notebook:
-#     file: walkthrough.ipynb
-#     timeout: 1200
+efficient_data_loading-walkthrough:
+  location: ../learning-PyTorch-on-IPU/efficient_data_loading
+  generated: true
+  notebook:
+    file: walkthrough.ipynb
+    timeout: 1200
 
 
-# mixed_precision-walkthrough:
-#   location: ../learning-PyTorch-on-IPU/mixed_precision
-#   generated: true
-#   notebook:
-#     file: walkthrough.ipynb
-#     timeout: 1200
-#   requirements_file: requirements.txt
+mixed_precision-walkthrough:
+  location: ../learning-PyTorch-on-IPU/mixed_precision
+  generated: true
+  notebook:
+    file: walkthrough.ipynb
+    timeout: 1200
+  requirements_file: requirements.txt
 
 
-# pipelining-walkthrough:
-#   location: ../learning-PyTorch-on-IPU/pipelining
-#   generated: true
-#   notebook:
-#     file: walkthrough.ipynb
-#     timeout: 1200
-#   requirements_file: requirements.txt
+pipelining-walkthrough:
+  location: ../learning-PyTorch-on-IPU/pipelining
+  generated: true
+  notebook:
+    file: walkthrough.ipynb
+    timeout: 1200
+  requirements_file: requirements.txt
 
 
-# finetuning-bert:
-#   location: ../finetuning-bert
-#   generated: true
-#   notebook:
-#     file: Fine-tuning-BERT.ipynb
-#     timeout: 10000
-#   requirements_file: requirements.txt
+finetuning-bert:
+  location: ../finetuning-bert
+  generated: true
+  notebook:
+    file: Fine-tuning-BERT.ipynb
+    timeout: 10000
+  requirements_file: requirements.txt
 
 # tgn:
 #   location: ../temporal-graph-networks
@@ -73,13 +73,13 @@ gptj-generative-inference:
 #   requirements_file: requirements.txt
 
 
-# distributed-kge:
-#   location: ../distributed-kge
-#   generated: true
-#   notebook:
-#     file: KgeModelling.ipynb
-#     timeout: 10000
-#   requirements_file: requirements.txt
+distributed-kge:
+  location: ../distributed-kge
+  generated: true
+  notebook:
+    file: KgeModelling.ipynb
+    timeout: 10000
+  requirements_file: requirements.txt
 
 # Removed pending model work
 # gpt2-textgen:
