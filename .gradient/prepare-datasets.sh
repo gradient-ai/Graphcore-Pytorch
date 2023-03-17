@@ -10,7 +10,7 @@ fi
 
 echo "Starting preparation of datasets"
 cd "$( dirname "$( readlink -e "${0}" )" )" || exit 1
-python3 -u ./symlink_datasets_and_caches.py
+./symlink_datasets_and_caches.py
 
 # pre-install the correct version of optimum for this release
 python3 -m pip install "optimum-graphcore>=0.5, <0.6"
