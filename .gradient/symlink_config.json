@@ -1,5 +1,5 @@
 {
-    "${POPLAR_EXECUTABLE_CACHE_DIR}":["fake_dataset", "${PUBLIC_DATASET_DIR}/poplar-executables-pytorch-3-1-1"],
+    "${POPLAR_EXECUTABLE_CACHE_DIR}":["${PUBLIC_DATASET_DIR}/poplar-executables-pytorch-3-1-1"],
     "${POPLAR_EXECUTABLE_CACHE_DIR}/fine-tuning-bert":["${PUBLIC_DATASET_DIR}/fine-tuning-bert"],
     "${HF_DATASETS_CACHE}/squad":["${PUBLIC_DATASET_DIR}/squad"],
     "${DATASET_DIR}/ogbl_wikikg2_custom":["${PUBLIC_DATASET_DIR}/ogbl_wikikg2_custom"],
