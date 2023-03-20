@@ -2,6 +2,9 @@ integrations:
   poplar-executables-pytorch-3-1-1:
     type: dataset
     ref: paperspace/ds5ecae0no6sej4:z5ry8bd
+  fine-tuning-bert:
+    type: dataset
+    ref: paperspace/ds6ir254r40g5e6:e3be5iw
   squad:
     type: dataset
     ref: paperspace/dsw2jrzd591wjrw:t6nyw3u
