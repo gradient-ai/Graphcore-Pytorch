@@ -5,8 +5,9 @@ from pathlib import Path
 import subprocess
 import os
 import warnings
+from typing import List
 
-def check_dataset_is_mounted(source_dirs_list):
+def check_dataset_is_mounted(source_dirs_list: List[str]) -> List[str]:
     source_dirs_exist_paths = []
     for source_dir in source_dirs_list:
         source_dir_path = Path(source_dir)
@@ -17,7 +18,6 @@ def check_dataset_is_mounted(source_dirs_list):
             time.sleep(1)
             COUNTER += 1
 
-        # dataset doesn't exist after 300s, so skip it
         if COUNTER == 300:
             warnings.warn(f"Abandoning symlink! - source dataset {source_dir} has not been mounted & populated after 5 minutes.")
         else:
@@ -27,7 +27,7 @@ def check_dataset_is_mounted(source_dirs_list):
     return source_dirs_exist_paths
 
 
-def create_overlays(source_dirs_exist_paths, target_dir):
+def create_overlays(source_dirs_exist_paths: List[str], target_dir: str) -> None:
     print(f"Symlinking - {source_dirs_exist_paths} to {target_dir}")
     print("-" * 100)
 
