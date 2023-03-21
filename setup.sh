@@ -13,12 +13,12 @@ export NUM_AVAILABLE_IPU=${IPU_ARG}
 export GRAPHCORE_POD_TYPE="pod${IPU_ARG}"
 
 export POPLAR_EXECUTABLE_CACHE_DIR="/tmp/exe_cache"
-export DATASET_DIR="/tmp/dataset_cache"
+export DATASETS_DIR="/tmp/dataset_cache"
 export CHECKPOINT_DIR="/tmp/checkpoints"
 
 # mounted public dataset directory (path in the container)
 # in the Paperspace environment this would be ="/datasets"
-export PUBLIC_DATASET_DIR="/datasets"
+export PUBLIC_DATASETS_DIR="/datasets"
 
 # Fine-tuning BERT uses the HF Squad dataset
 export HUGGINGFACE_HUB_CACHE="/tmp/huggingface_caches"
