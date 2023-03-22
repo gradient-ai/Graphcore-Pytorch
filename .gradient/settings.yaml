@@ -16,7 +16,7 @@ integrations:
     ref: paperspace/dsftg00ynvrawou:m5z5tmm
   glue:
     type: dataset
-    ref: paperpsace/dsalacr4p2hnbnq:ckb5h6e
+    ref: paperspace/dsalacr4p2hnbnq:ckb5h6e
   chest-xray-nihcc-3:
     type: dataset
     ref: paperspace/dsfzugibmi3rtyo:1mq8ehu
