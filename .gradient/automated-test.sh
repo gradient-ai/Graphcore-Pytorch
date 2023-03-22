@@ -61,7 +61,7 @@ else
     EXAMPLES_UTILS_REV=${8}
 fi
 
-python -m pip install "examples-utils[jupyter] @ git+https://github.com/graphcore/examples-utils.git"
+python -m pip install "examples-utils[jupyter] @ git+https://github.com/graphcore/examples-utils@${EXAMPLES_UTILS_REV}"
 python -m pip install gradient
 # In sh single equal is needed for string compare.
 if [ "${4}" = "upload-reports" ]
