@@ -42,7 +42,7 @@ symlink-public-resources "${gptj_cache_source_dir}" "$POPLAR_EXECUTABLE_CACHE_DI
 # Symlink squad
 symlink-public-resources "${PUBLIC_DATASETS_DIR}/squad" "${HF_DATASETS_CACHE}/squad"
 symlink-public-resources "${PUBLIC_DATASETS_DIR}/glue" "${HF_DATASETS_CACHE}/glue"
-symlink-public-resources "${PUBLIC_DATASETS_DIR}/gptj-6b-checkpoints" "${CHECKPOINT_DIR}"
+symlink-public-resources "${PUBLIC_DATASETS_DIR}/gptj-6b-checkpoints" "${TRANSFORMERS_CACHE}"
 # Symlink OGB Wiki dataset and checkpoint
 symlink-public-resources "${PUBLIC_DATASETS_DIR}/ogbl_wikikg2_custom" "${DATASETS_DIR}/ogbl_wikikg2_custom"
 
