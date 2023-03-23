@@ -86,9 +86,9 @@ get-started-PyG-SchNetGNN:
   location: ../schnet-graph-network
   generated: true
   notebook:
-    file: PyG-SchNetGNN.ipynb
+    file: molecular_property_prediction_with_schnet.ipynb
     timeout: 3600
-  requirements_file: requirements-pyg.txt
+  requirements_file: requirements.txt
 
 
 
