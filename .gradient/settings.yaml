@@ -11,9 +11,6 @@ integrations:
   poplar-executables-3-1-gptj:
     type: dataset
     ref: paperspace/dsk1tv1rcsvy1h2:3ci2mes
-  gptj-6b-checkpoints:
-    type: dataset
-    ref: paperspace/dsftg00ynvrawou:3okp5u1
   glue:
     type: dataset
     ref: paperspace/dsalacr4p2hnbnq:ckb5h6e
