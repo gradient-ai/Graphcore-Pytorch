@@ -81,17 +81,6 @@ vit-model-training:
     timeout: 10000
   requirements_file: requirements.txt
 
-# GNN team testing separately
-get-started-PyG-SchNetGNN:
-  location: ../schnet-graph-network
-  generated: true
-  notebook:
-    file: molecular_property_prediction_with_schnet.ipynb
-    timeout: 3600
-  requirements_file: requirements.txt
-
-
-
 # Useful references
 useful-managing-ipu-resources:
   location: ../useful-tips
