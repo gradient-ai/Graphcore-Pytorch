@@ -49,11 +49,11 @@ symlink-public-resources "${gptj_cache_source_dir}" "$POPLAR_EXECUTABLE_CACHE_DI
 # Symlink squad
 symlink-public-resources "${PUBLIC_DATASETS_DIR}/squad" "${HF_DATASETS_CACHE}/squad"
 symlink-public-resources "${PUBLIC_DATASETS_DIR}/glue" "${HF_DATASETS_CACHE}/glue"
-# Symlink OGB Wiki dataset and checkpoint
-symlink-public-resources "${PUBLIC_DATASETS_DIR}/ogbl_wikikg2_custom" "${DATASETS_DIR}/ogbl_wikikg2_custom"
 
 # symlink local dataset used by vit-model-training notebook
 symlink-public-resources "${PUBLIC_DATASETS_DIR}/chest-xray-nihcc-3" "${DATASETS_DIR}/chest-xray-nihcc-3"
+# Symlink OGB Wiki dataset and checkpoint
+symlink-public-resources "${PUBLIC_DATASETS_DIR}/ogbl_wikikg2_custom" "${DATASETS_DIR}/ogbl_wikikg2_custom"
 
 # pre-install the correct version of optimum for this release
 python -m pip install "optimum-graphcore>=0.5, <0.6"
