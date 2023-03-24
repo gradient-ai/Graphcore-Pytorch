@@ -1,7 +1,10 @@
 {
     "${POPLAR_EXECUTABLE_CACHE_DIR}":["${PUBLIC_DATASETS_DIR}/poplar-executables-pytorch-3-1-1"],
     "${POPLAR_EXECUTABLE_CACHE_DIR}/fine-tuning-bert":["${PUBLIC_DATASETS_DIR}/poplar-executables-3-1-bert"],
+    "${POPLAR_EXECUTABLE_CACHE_DIR}/gptj":["${PUBLIC_DATASETS_DIR}/poplar-executables-3-1-gptj"],
     "${HF_DATASETS_CACHE}/squad":["${PUBLIC_DATASETS_DIR}/squad"],
+    "${HF_DATASETS_CACHE}/glue":["${PUBLIC_DATASETS_DIR}/glue"],
+    "${TRANSFORMERS_CACHE}":["${PUBLIC_DATASETS_DIR}/gptj-6b-checkpoints"],
     "${DATASETS_DIR}/ogbl_wikikg2_custom":["${PUBLIC_DATASETS_DIR}/ogbl_wikikg2_custom"],
     "${DATASETS_DIR}/chest-xray-nihcc-3": ["${PUBLIC_DATASETS_DIR}/chest-xray-nihcc-3"]
 }
