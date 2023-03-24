@@ -2,10 +2,24 @@ from pathlib import Path
 import subprocess
 import json
 import os
+import yaml
 
 # Check that the datasets have mounted as expected
 
 # Gather the datasets expected from the settings.yaml
+with open('settings.yaml') as f:
+    my_dict = yaml.safe_load(f)
+    datasets = my_dict["integrations"].keys()
+
+# Check that dataset exists and
+dirname = Path("/datasets")
+datasets_sub_directories = [str(f) for f in dirname.iterdir() if f.is_dir()]
+print(datasets_sub_directories)
+for dataset in datasets:
+    full_path = str(dirname/dataset)
+    if full_path not in datasets_sub_directories:
+        print(dataset + " not found")
+
 # Using script from examples-utils check that the metadata files are correct
 # Do not need to run full hash checks
 
