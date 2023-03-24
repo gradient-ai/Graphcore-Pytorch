@@ -1,8 +1,25 @@
 Graphcore-Pytorch-README_first:
-  location: ../
+ location: ../
+ generated: true
+ notebook:
+   file: README_first.ipynb
+
+gptj-finetuning:
+  location: ../gptj-text-generation/
   generated: true
   notebook:
-    file: README_first.ipynb
+    file: finetuning.ipynb
+    timeout: 15000
+  requirements_file: requirements.txt
+
+
+gptj-generative-inference:
+  location: ../gptj-text-generation/
+  generated: true
+  notebook:
+    file: GPTJ-generative-inference.ipynb
+    timeout: 3600
+  requirements_file: requirements.txt
 
 tutorial-basics-walkthrough:
   location: ../learning-PyTorch-on-IPU/basics
@@ -89,7 +106,6 @@ get-started-PyG-SchNetGNN:
     file: PyG-SchNetGNN.ipynb
     timeout: 3600
   requirements_file: requirements-pyg.txt
-
 
 
 # Useful references
