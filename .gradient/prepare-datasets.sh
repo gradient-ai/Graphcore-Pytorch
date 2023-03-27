@@ -39,7 +39,7 @@ then
     apt install -o DPkg::Lock::Timeout=120 -y psmisc libfuse3-dev fuse-overlayfs
 fi
 
-# RRR install lmpe and dependencies, needed for gptj
+# install libraries needed for gpt-j
 sudo apt-get update -y && sudo apt-get install -y libopenmpi-dev
 sudo apt-get install -y liblmpe-dev libnl-3-dev
 
