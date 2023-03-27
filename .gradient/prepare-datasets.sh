@@ -44,8 +44,6 @@ echo "Starting preparation of datasets"
 exe_cache_source_dir="${PUBLIC_DATASETS_DIR}/poplar-executables-pytorch-3-2"
 symlink-public-resources "${exe_cache_source_dir}" $POPLAR_EXECUTABLE_CACHE_DIR
 
-gptj_cache_source_dir="${PUBLIC_DATASETS_DIR}/poplar-executables-3-1-gptj"
-symlink-public-resources "${gptj_cache_source_dir}" "$POPLAR_EXECUTABLE_CACHE_DIR/gptj"
 # Symlink squad
 symlink-public-resources "${PUBLIC_DATASETS_DIR}/squad" "${HF_DATASETS_CACHE}/squad"
 symlink-public-resources "${PUBLIC_DATASETS_DIR}/glue" "${HF_DATASETS_CACHE}/glue"
