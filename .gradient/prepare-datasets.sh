@@ -40,8 +40,8 @@ then
 fi
 
 # RRR install lmpe and dependencies, needed for gptj
-sudo apt-get update && sudo apt-get install libopenmpi-dev
-sudo apt-get install liblmpe-dev libnl-3-dev
+sudo apt-get update -y && sudo apt-get install -y libopenmpi-dev
+sudo apt-get install -y liblmpe-dev libnl-3-dev
 
 
 echo "Starting preparation of datasets"
