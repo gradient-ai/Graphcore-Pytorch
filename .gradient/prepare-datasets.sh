@@ -39,6 +39,11 @@ then
     apt install -o DPkg::Lock::Timeout=120 -y psmisc libfuse3-dev fuse-overlayfs
 fi
 
+# RRR install lmpe and dependencies, needed for gptj
+sudo apt-get update && sudo apt-get install libopenmpi-dev
+sudo apt-get install liblmpe-dev libnl-3-dev
+
+
 echo "Starting preparation of datasets"
 # symlink exe_cache files
 exe_cache_source_dir="${PUBLIC_DATASETS_DIR}/poplar-executables-pytorch-3-2"
