@@ -41,7 +41,7 @@ fi
 
 # install libraries needed for gpt-j
 sudo apt-get update -y && sudo apt-get install -y libopenmpi-dev
-sudo apt-get install -y liblmpe-dev libnl-3-dev
+#sudo apt-get install -y liblmpe-dev libnl-3-dev
 
 
 echo "Starting preparation of datasets"
