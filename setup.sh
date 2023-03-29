@@ -25,6 +25,8 @@ fi
 export NUM_AVAILABLE_IPU=${IPU_ARG}
 export GRAPHCORE_POD_TYPE="pod${IPU_ARG}"
 
+export TIER_TYPE=$(python .gradient/check_tier.py)
+
 export POPLAR_EXECUTABLE_CACHE_DIR="/tmp/exe_cache"
 export DATASETS_DIR="/tmp/dataset_cache"
 export CHECKPOINT_DIR="/tmp/checkpoints"
