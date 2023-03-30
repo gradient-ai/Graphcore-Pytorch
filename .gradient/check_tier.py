@@ -3,14 +3,13 @@
 import os
 
 hostname = os.getenv("HOSTNAME", "unknown")
-# TODO: Get list of hostnames for paid tier only
-paid_hostnames = [
-    "list",
-    "of",
-    "hostnames",
-]
 
-if hostname in paid_hostnames:
-    print("PAID")
-else:
+# Free tier hosts
+free_hostnames = [f"lr17-1-poplar-{i}" for i in range(1, 36)]
+free_hostnames.append("lr17-1-poplar-63")
+free_hostnames.append("lr17-1-poplar-64")
+
+if hostname in free_hostnames:
     print("FREE")
+else:
+    print("PAID")
