@@ -34,6 +34,7 @@ export CHECKPOINT_DIR="/tmp/checkpoints"
 # mounted public dataset directory (path in the container)
 # in the Paperspace environment this would be ="/datasets"
 export PUBLIC_DATASETS_DIR="/datasets"
+export GCLOGGER_CONFIG="${PUBLIC_DATASETS_DIR}/gcl"
 
 # Fine-tuning BERT uses the HF Squad dataset
 export HUGGINGFACE_HUB_CACHE="/tmp/huggingface_caches"
