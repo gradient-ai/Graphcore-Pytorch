@@ -1,7 +1,7 @@
 --find-links https://download.pytorch.org/whl/cpu/torch_stable.html
 
 
-examples-utils[common] @ git+https://github.com/graphcore/examples-utils.git
+examples-utils[common] @ git+https://github.com/graphcore/examples-utils@latest_stable
 pyyaml==5.4.1
 dataclasses==0.8; python_version < '3.7'
 transformers==4.20.1

@@ -15,3 +15,5 @@ periodictable==1.6.1
 py3Dmol==1.8.1
 seaborn==0.12.1
 numpy==1.23.5
+
+examples-utils[common] @ git+https://github.com/graphcore/examples-utils@latest_stable
