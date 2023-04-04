@@ -1,7 +1,7 @@
 integrations:
   poplar-executables-pytorch-3-2:
     type: dataset
-    ref: paperspace/
+    ref: paperspace/dshhoup1sk0p9cz:8mx7r3a
   squad:
     type: dataset
     ref: paperspace/dsw2jrzd591wjrw:t6nyw3u
