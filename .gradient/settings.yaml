@@ -2,15 +2,9 @@ integrations:
   poplar-executables-pytorch-3-2:
     type: dataset
     ref: paperspace/dshhoup1sk0p9cz:8mx7r3a
-  squad:
-    type: dataset
-    ref: paperspace/dsw2jrzd591wjrw:t6nyw3u
   ogbl_wikikg2_custom:
     type: dataset
     ref: paperspace/ds5fogtxxi0h935:wqp02u5
-  glue:
-    type: dataset
-    ref: paperspace/dsalacr4p2hnbnq:ckb5h6e
   chest-xray-nihcc-3:
     type: dataset
     ref: paperspace/dsfzugibmi3rtyo:1mq8ehu
