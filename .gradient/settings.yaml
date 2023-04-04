@@ -8,6 +8,12 @@ integrations:
   ogbl_wikikg2_custom:
     type: dataset
     ref: paperspace/ds5fogtxxi0h935:wqp02u5
+  poplar-executables-3-1-gptj:
+    type: dataset
+    ref: paperspace/dsk1tv1rcsvy1h2:3ci2mes
+  glue:
+    type: dataset
+    ref: paperspace/dsalacr4p2hnbnq:ckb5h6e
   chest-xray-nihcc-3:
     type: dataset
     ref: paperspace/dsfzugibmi3rtyo:1mq8ehu
