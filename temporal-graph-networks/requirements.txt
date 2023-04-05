@@ -2,7 +2,7 @@
 
 matplotlib==3.7.1
 numpy==1.24.2
-pandas==1.5.3
+pandas==2.0.0
 pytest==6.2.5
 torch-geometric==2.2.0
 torch-scatter==2.1.0+pt113cpu
