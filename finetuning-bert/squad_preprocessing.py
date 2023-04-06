@@ -86,19 +86,13 @@ def prepare_train_features(examples):
                 token_end_index -= 1
 
             # Detect if the answer is out of the span (in which case this feature is labeled with the CLS index).
-            if not (
-                offsets[token_start_index][0] <= start_char
-                and offsets[token_end_index][1] >= end_char
-            ):
+            if not (offsets[token_start_index][0] <= start_char and offsets[token_end_index][1] >= end_char):
                 tokenized_examples["start_positions"].append(cls_index)
                 tokenized_examples["end_positions"].append(cls_index)
             else:
                 # Otherwise move the token_start_index and token_end_index to the two ends of the answer.
                 # Note: we could go after the last offset if the answer is the last word (edge case).
-                while (
-                    token_start_index < len(offsets)
-                    and offsets[token_start_index][0] <= start_char
-                ):
+                while token_start_index < len(offsets) and offsets[token_start_index][0] <= start_char:
                     token_start_index += 1
                 tokenized_examples["start_positions"].append(token_start_index - 1)
                 while offsets[token_end_index][1] >= end_char:
@@ -173,9 +167,7 @@ def postprocess_qa_predictions(
     predictions = collections.OrderedDict()
 
     # Logging.
-    print(
-        f"Post-processing {len(examples)} example predictions split into {len(features)} features."
-    )
+    print(f"Post-processing {len(examples)} example predictions split into {len(features)} features.")
 
     # Let's loop over all the examples!
     for example_index, example in enumerate(tqdm(examples)):
@@ -196,17 +188,13 @@ def postprocess_qa_predictions(
             offset_mapping = features[feature_index]["offset_mapping"]
 
             # Update minimum null prediction.
-            cls_index = features[feature_index]["input_ids"].index(
-                tokenizer.cls_token_id
-            )
+            cls_index = features[feature_index]["input_ids"].index(tokenizer.cls_token_id)
             feature_null_score = start_logits[cls_index] + end_logits[cls_index]
             if min_null_score is None or min_null_score < feature_null_score:
                 min_null_score = feature_null_score
 
             # Go through all possibilities for the `n_best_size` greater start and end logits.
-            start_indexes = np.argsort(start_logits)[
-                -1 : -n_best_size - 1 : -1
-            ].tolist()
+            start_indexes = np.argsort(start_logits)[-1 : -n_best_size - 1 : -1].tolist()
             end_indexes = np.argsort(end_logits)[-1 : -n_best_size - 1 : -1].tolist()
             for start_index in start_indexes:
                 for end_index in end_indexes:
@@ -222,10 +210,7 @@ def postprocess_qa_predictions(
                     ):
                         continue
                     # Don't consider answers with a length that is either < 0 or > max_answer_length.
-                    if (
-                        end_index < start_index
-                        or end_index - start_index + 1 > max_answer_length
-                    ):
+                    if end_index < start_index or end_index - start_index + 1 > max_answer_length:
                         continue
 
                     start_char = offset_mapping[start_index][0]
@@ -238,9 +223,7 @@ def postprocess_qa_predictions(
                     )
 
         if len(valid_answers) > 0:
-            best_answer = sorted(valid_answers, key=lambda x: x["score"], reverse=True)[
-                0
-            ]
+            best_answer = sorted(valid_answers, key=lambda x: x["score"], reverse=True)[0]
         else:
             # In the very rare edge case we have not a single non-null prediction, we create a fake prediction to avoid
             # failure.
@@ -250,9 +233,7 @@ def postprocess_qa_predictions(
         if not squad_v2:
             predictions[example["id"]] = best_answer["text"]
         else:
-            answer = (
-                best_answer["text"] if best_answer["score"] > min_null_score else ""
-            )
+            answer = best_answer["text"] if best_answer["score"] > min_null_score else ""
             predictions[example["id"]] = answer
 
     return predictions

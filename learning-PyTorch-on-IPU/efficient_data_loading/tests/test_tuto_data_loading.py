@@ -14,9 +14,7 @@ working_path = Path(__file__).parent.parent
 @pytest.mark.ipus(1)
 def test_run_default_ipu():
     # Check default params
-    testing_util.run_command(
-        "python tuto_data_loading.py", working_path, "IPU throughput"
-    )
+    testing_util.run_command("python tuto_data_loading.py", working_path, "IPU throughput")
 
 
 @pytest.mark.category1
@@ -34,9 +32,7 @@ def test_run_synthetic_ipu():
 @pytest.mark.ipus(2)
 def test_run_replication_ipu():
     # Check replication
-    testing_util.run_command(
-        "python tuto_data_loading.py --replicas 2", working_path, "IPU throughput"
-    )
+    testing_util.run_command("python tuto_data_loading.py --replicas 2", working_path, "IPU throughput")
 
 
 @pytest.mark.category1

@@ -44,13 +44,13 @@ class Data:
         self.batch_size = batch_size
         self.nodes_size = 1 + nodes_size  # rough empirical figures
         self.edges_size = edges_size
-        train, val, test = self.data.train_val_test_split(
-            val_ratio=0.15, test_ratio=0.15
-        )
+        train, val, test = self.data.train_val_test_split(val_ratio=0.15, test_ratio=0.15)
 
-        self.loader = dict(train=TemporalDataLoader(train, batch_size=self.batch_size),
-                           val=TemporalDataLoader(val, batch_size=self.batch_size),
-                           test=TemporalDataLoader(test, batch_size=self.batch_size))
+        self.loader = dict(
+            train=TemporalDataLoader(train, batch_size=self.batch_size),
+            val=TemporalDataLoader(val, batch_size=self.batch_size),
+            test=TemporalDataLoader(test, batch_size=self.batch_size),
+        )
         feature_size = self.data.msg.shape[-1]
         self.batch_spec = dict(
             # Map from idx -> (global) node ID
@@ -70,9 +70,7 @@ class Data:
 
         # Precompute the correct starting state of LastNeighborLoader for each partition
         self.neighbour_loaders = {}
-        neighbour_loader = G.nn.models.tgn.LastNeighborLoader(
-            self.data.num_nodes, size=10
-        )
+        neighbour_loader = G.nn.models.tgn.LastNeighborLoader(self.data.num_nodes, size=10)
         self.neighbour_loaders["train"] = copy.deepcopy(neighbour_loader)
         for batch in self.loader["train"]:
             neighbour_loader.insert(batch.src, batch.dst)
@@ -87,8 +85,7 @@ class Data:
         for part in ["val", "test"]:
             torch.manual_seed(12345)
             self.neg_samples[part] = [
-                torch.randint(dst_min, dst_max + 1, batch.src.shape, dtype=torch.long)
-                for batch in self.loader[part]
+                torch.randint(dst_min, dst_max + 1, batch.src.shape, dtype=torch.long) for batch in self.loader[part]
             ]
 
     def n_batches(self, partition):
@@ -108,18 +105,12 @@ class Data:
                 if partition == "train"
                 else self.neg_samples[partition][batch_n]
             )
-            node_ids, edges, edge_ids = neighbour_loader(
-                torch.cat([batch.src, batch.dst, neg_dst]).unique()
-            )
+            node_ids, edges, edge_ids = neighbour_loader(torch.cat([batch.src, batch.dst, neg_dst]).unique())
             node_id_to_idx[node_ids] = torch.arange(node_ids.shape[0])
-            batch_idx = torch.stack(
-                [node_id_to_idx[ids] for ids in [batch.src, batch.dst, neg_dst]]
-            )
+            batch_idx = torch.stack([node_id_to_idx[ids] for ids in [batch.src, batch.dst, neg_dst]])
             # Transpose first because in "most recent" we want axis=1 (sequence)
             # ordered first, then axis=0 (src/dest)
-            batch_most_recent = (
-                most_recent_indices(batch_idx[:2].T.flatten()).reshape(-1, 2).T
-            )
+            batch_most_recent = most_recent_indices(batch_idx[:2].T.flatten()).reshape(-1, 2).T
             yield dict(
                 node_ids=node_ids,
                 node_idx=batch_idx.type(torch.long),
@@ -135,9 +126,7 @@ class Data:
 
     def _pad_batch(self, batch):
         assert batch.keys() == self.batch_spec.keys()
-        assert (
-            batch["node_ids"].shape[0] <= self.nodes_size - 1
-        ), "node_ids requires at least 1 padding element"
+        assert batch["node_ids"].shape[0] <= self.nodes_size - 1, "node_ids requires at least 1 padding element"
 
         out = {}
         for key, (shape, dtype, pad_value) in self.batch_spec.items():
@@ -153,7 +142,7 @@ class Data:
                 padding.extend([0, target - actual])
 
             out[key] = F.pad(value.type(dtype), padding, value=pad_value)
-            if key == 'node_ids':
+            if key == "node_ids":
                 out[key] += 1
 
         return out
@@ -174,8 +163,7 @@ class TimeEncoder(nn.Module):
 
 
 class TransformerConv(nn.Module):
-    def __init__(self, in_channels, out_channels, edge_dim, dropout,
-                 heads, bias=True):
+    def __init__(self, in_channels, out_channels, edge_dim, dropout, heads, bias=True):
 
         super(TransformerConv, self).__init__()
         self.in_channels = in_channels
@@ -220,7 +208,7 @@ class TransformerConv(nn.Module):
         return out
 
     def __repr__(self):
-        return f'{self.__class__.__name__}(in={self.in_channels}, out={self.out_channels}, edge_dim={self.edge_dim}, heads={self.heads})'
+        return f"{self.__class__.__name__}(in={self.in_channels}, out={self.out_channels}, edge_dim={self.edge_dim}, heads={self.heads})"
 
 
 class GraphAttentionEmbedding(nn.Module):
@@ -272,10 +260,12 @@ class TGNMemory(nn.Module):
         self.gru = nn.GRUCell(gru_in_dim, memory_dim, dtype=self.dtype)
 
         # last_update, rel_t, pos_dst
-        self.register_buffer('_memory_ints', torch.empty(num_nodes + 1, 3, dtype=torch.float))
-        self.register_buffer('_memory', torch.empty(num_nodes + 1, memory_dim, dtype=self.dtype))
-        self.register_buffer('_memory_msg', torch.empty(num_nodes + 1, raw_msg_dim, dtype=self.dtype))
-        self.register_buffer('_direction', torch.empty(num_nodes + 1, 2, dtype=self.dtype))    #TODO: this can be combined with _memory
+        self.register_buffer("_memory_ints", torch.empty(num_nodes + 1, 3, dtype=torch.float))
+        self.register_buffer("_memory", torch.empty(num_nodes + 1, memory_dim, dtype=self.dtype))
+        self.register_buffer("_memory_msg", torch.empty(num_nodes + 1, raw_msg_dim, dtype=self.dtype))
+        self.register_buffer(
+            "_direction", torch.empty(num_nodes + 1, 2, dtype=self.dtype)
+        )  # TODO: this can be combined with _memory
 
         self.reset_state()
 
@@ -308,12 +298,15 @@ class TGNMemory(nn.Module):
         raw_msg = self._memory_msg[n_id]
         direction = self._direction[n_id]
         # aggregate messages
-        aggr = torch.cat([
-            src_memory * direction[:, 0:1] + dst_memory * direction[:, 1:2],
-            src_memory * direction[:, 1:2] + dst_memory * direction[:, 0:1],
-            raw_msg,
-            time_encoding,
-        ], 1)
+        aggr = torch.cat(
+            [
+                src_memory * direction[:, 0:1] + dst_memory * direction[:, 1:2],
+                src_memory * direction[:, 1:2] + dst_memory * direction[:, 0:1],
+                raw_msg,
+                time_encoding,
+            ],
+            1,
+        )
         memory = self.gru(aggr, src_memory)
         return memory, last_update.long()
 
@@ -329,37 +322,36 @@ class TGNMemory(nn.Module):
     ):
         # only write node_ids for [src, pos_dst]
         idx = node_idx[:2]
-        flat_idx = torch.reshape(idx, (-1, ))
-        write_n_id = node_ids[flat_idx]    # [2xBatch, ] tensor with src&dst ids
+        flat_idx = torch.reshape(idx, (-1,))
+        write_n_id = node_ids[flat_idx]  # [2xBatch, ] tensor with src&dst ids
 
         # mask out all but unique most recent src and dst
-        masked_indices = torch.reshape(most_recent, (-1, )) * write_n_id   # not most recent will be written to padding node 0
+        masked_indices = (
+            torch.reshape(most_recent, (-1,)) * write_n_id
+        )  # not most recent will be written to padding node 0
         last_update = last_update[flat_idx]
 
         dt = node_t.repeat(2) - last_update
-        neighbours = write_n_id.roll(int(idx.size(1)))   # swap src and dst for the symmetric triplet
-        direction = torch.eye(2).repeat_interleave(idx.shape[1], 0)   # [1,0] for src ids, [0,1] for dst ids
+        neighbours = write_n_id.roll(int(idx.size(1)))  # swap src and dst for the symmetric triplet
+        direction = torch.eye(2).repeat_interleave(idx.shape[1], 0)  # [1,0] for src ids, [0,1] for dst ids
         if self.target == "ipu":
             direction = direction.to(neighbours.device)
 
         self._memory_ints.index_put_(
             indices=(masked_indices,),
-            values=torch.stack([
-                node_t.repeat(2).float(),
-                dt.float(),
-                neighbours.float(),
-            ], dim=-1)
+            values=torch.stack(
+                [
+                    node_t.repeat(2).float(),
+                    dt.float(),
+                    neighbours.float(),
+                ],
+                dim=-1,
+            ),
         )
 
-        self._memory.index_put_(
-            indices=(masked_indices,),
-            values=memory[flat_idx]  # memory for src and dst
-        )
+        self._memory.index_put_(indices=(masked_indices,), values=memory[flat_idx])  # memory for src and dst
 
-        self._memory_msg.index_put_(
-            indices=(masked_indices,),
-            values=node_msg.repeat(2, 1)  # messages btw them
-        )
+        self._memory_msg.index_put_(indices=(masked_indices,), values=node_msg.repeat(2, 1))  # messages btw them
 
         self._direction.index_put_(
             indices=(masked_indices,),
@@ -387,15 +379,7 @@ class TGNMemory(nn.Module):
 
 
 class TGN(nn.Module):
-    def __init__(self,
-                 num_nodes,
-                 raw_msg_dim,
-                 memory_dim,
-                 time_dim,
-                 embedding_dim,
-                 dtype,
-                 dropout,
-                 target):
+    def __init__(self, num_nodes, raw_msg_dim, memory_dim, time_dim, embedding_dim, dtype, dropout, target):
         super(TGN, self).__init__()
 
         # Create an IPU compatible memory module
@@ -457,8 +441,7 @@ class TGN(nn.Module):
             loss = self.criterion(pos_out, torch.ones_like(pos_out))
             loss += self.criterion(neg_out, torch.zeros_like(neg_out))
 
-        self.memory.update_state(memory, last_update, node_ids, node_idx,
-                                 node_t, node_msg, most_recent)
+        self.memory.update_state(memory, last_update, node_ids, node_idx, node_t, node_msg, most_recent)
 
         if self.training:
             return count, poptorch.identity_loss(loss, "none")

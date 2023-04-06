@@ -27,9 +27,7 @@ def run_poptorch_mnist(parameters):
 @pytest.mark.category2
 def test_accuracy_calculation():
     """Training tests for MNIST in PopTorch"""
-    pred = torch.tensor(
-        [[0.9, 0.05, 0.05], [0.1, 0.5, 0.4], [0.6, 0.01, 0.49], [0.09, 0.11, 0.8]]
-    )
+    pred = torch.tensor([[0.9, 0.05, 0.05], [0.1, 0.5, 0.4], [0.6, 0.01, 0.49], [0.09, 0.11, 0.8]])
     label = torch.tensor([0, 1, 2, 2])
     acc = accuracy(pred, label)
     assert acc == 75
@@ -41,9 +39,7 @@ def test_accuracy_calculation():
 @pytest.mark.parametrize("offload", [True, False])
 def test_test_final_training_accuracy(strategy, offload):
     if offload:
-        out = run_poptorch_mnist(
-            f"--strategy {strategy} --epochs 2 " f"--offload-optimiser"
-        )
+        out = run_poptorch_mnist(f"--strategy {strategy} --epochs 2 " f"--offload-optimiser")
     else:
         out = run_poptorch_mnist(f"--strategy {strategy} --epochs 2")
     final_acc = 0.0

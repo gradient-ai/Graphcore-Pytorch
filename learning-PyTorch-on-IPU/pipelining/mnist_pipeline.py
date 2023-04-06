@@ -39,9 +39,7 @@ def get_mnist_data(opts):
     )
 
     validation_data = poptorch.DataLoader(
-        poptorch.Options().deviceIterations(
-            opts.gradient_accumulation * opts.device_iterations
-        ),
+        poptorch.Options().deviceIterations(opts.gradient_accumulation * opts.device_iterations),
         torchvision.datasets.MNIST(
             "~/.torch/datasets",
             train=False,
@@ -171,9 +169,7 @@ if __name__ == "__main__":
         default=8,
         help="batch size for testing (default: 8)",
     )
-    parser.add_argument(
-        "--epochs", type=int, default=3, help="number of epochs to train (default: 3)"
-    )
+    parser.add_argument("--epochs", type=int, default=3, help="number of epochs to train (default: 3)")
     parser.add_argument(
         "--learning-rate",
         type=float,
@@ -197,12 +193,8 @@ if __name__ == "__main__":
         default="pipelined",
         help="execution strategy",
     )
-    parser.add_argument(
-        "--offload-optimiser", action="store_true", help="offload optimiser state"
-    )
-    parser.add_argument(
-        "--debug", action="store_true", help="print out the debug logging while running"
-    )
+    parser.add_argument("--offload-optimiser", action="store_true", help="offload optimiser state")
+    parser.add_argument("--debug", action="store_true", help="print out the debug logging while running")
     opts = parser.parse_args()
 
     if opts.debug:
@@ -235,19 +227,11 @@ if __name__ == "__main__":
     if opts.offload_optimiser:
         # Set the storage for activations, weights, accumulator explicitly.
         # Show how to use these options.
-        model_opts.TensorLocations.setActivationLocation(
-            poptorch.TensorLocationSettings().useOnChipStorage(True)
-        )
-        model_opts.TensorLocations.setWeightLocation(
-            poptorch.TensorLocationSettings().useOnChipStorage(True)
-        )
-        model_opts.TensorLocations.setAccumulatorLocation(
-            poptorch.TensorLocationSettings().useOnChipStorage(True)
-        )
+        model_opts.TensorLocations.setActivationLocation(poptorch.TensorLocationSettings().useOnChipStorage(True))
+        model_opts.TensorLocations.setWeightLocation(poptorch.TensorLocationSettings().useOnChipStorage(True))
+        model_opts.TensorLocations.setAccumulatorLocation(poptorch.TensorLocationSettings().useOnChipStorage(True))
         # Stores the optimiser state in remote buffers instead of IPUs' memory.
-        model_opts.TensorLocations.setOptimizerLocation(
-            poptorch.TensorLocationSettings().useOnChipStorage(False)
-        )
+        model_opts.TensorLocations.setOptimizerLocation(poptorch.TensorLocationSettings().useOnChipStorage(False))
 
     if opts.profile:
         print("Profiling is enabled.")

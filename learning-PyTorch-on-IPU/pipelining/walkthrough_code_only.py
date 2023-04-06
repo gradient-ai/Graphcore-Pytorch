@@ -175,9 +175,7 @@ sharded_strategy = poptorch.ShardedExecution(
     poptorch.Stage("B4").ipu(3),
 )
 
-train_opts.TensorLocations.setOptimizerLocation(
-    poptorch.TensorLocationSettings().useOnChipStorage(False)
-)
+train_opts.TensorLocations.setOptimizerLocation(poptorch.TensorLocationSettings().useOnChipStorage(False))
 
 
 def train(training_model, training_data):

@@ -60,7 +60,7 @@ If a problem persists or you want to give us feedback on the content of this not
 >if __name__ == '__main__':
 >```
 >
-> This is necessary to avoid [issues with asynchronous DataLoader](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.0.0/batching.html#poptorch-asynchronousdataaccessor).
+> This is necessary to avoid [issues with asynchronous DataLoader](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.1.0/batching.html#poptorch-asynchronousdataaccessor).
 > Implications of the asynchronous data loader are covered in [our tutorial on efficient data loading](../efficient_data_loading)
 """
 """
@@ -92,7 +92,7 @@ In general, a pipeline reaches steady state and full utilisation after `2N+1` st
 For each stage, forward and backward passes are always executed on the same IPU.
 
 Beyond pipelined execution, other execution strategies are available which offer different performance and memory tradeoffs,
-these are beyond the scope of this tutorial but are covered in the [multi-IPU execution strategies section](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.0.0/overview.html#multi-ipu-execution-strategies) of the PopTorch documentation.
+these are beyond the scope of this tutorial but are covered in the [multi-IPU execution strategies section](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.1.0/overview.html#multi-ipu-execution-strategies) of the PopTorch documentation.
 """
 # The following code is only necessary to prevent errors when running the source
 # file as a script.
@@ -186,7 +186,7 @@ test_dataset = torchvision.datasets.MNIST(
     ),
 )
 """
-[poptorch.DataLoader](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.0.0/pytorch_to_poptorch.html#preparing-your-data)
+[poptorch.DataLoader](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.1.0/pytorch_to_poptorch.html#preparing-your-data)
 is used to efficiently load data batches to IPU.
 More information about the use of `poptorch.Dataloader`
 can be found in the [PopTorch tutorial on efficient data loading](../efficient_data_loading).
@@ -250,7 +250,7 @@ class ConvLayer(nn.Module):
 
 
 """
-To use pipelined execution we must split our model using [block annotations](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.0.0/overview.html#annotations).
+To use pipelined execution we must split our model using [block annotations](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.1.0/overview.html#annotations).
 To provide flexibility, PopTorch lets us split our model into blocks and we can decide later how to group these blocks into
 multiple stages to place them on different IPUs.
 
@@ -265,13 +265,13 @@ executed on different IPUs. The picture below illustrates this process.
 
 ![jpeg](static/stages-poptorch.jpeg)
 
-As described in the [User Guide](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.0.0/overview.html#model-partitioning-using-blocks),
+As described in the [User Guide](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.1.0/overview.html#model-partitioning-using-blocks),
 there are three ways to define blocks:
 
-- using the [poptorch.Block](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.0.0/reference.html#poptorch.Block) scope;
-- using the [poptorch.BlockFunction](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.0.0/reference.html#poptorch.BlockFunction) decorator on the forward method of a `Module`;
+- using the [poptorch.Block](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.1.0/reference.html#poptorch.Block) scope;
+- using the [poptorch.BlockFunction](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.1.0/reference.html#poptorch.BlockFunction) decorator on the forward method of a `Module`;
 - wrapping layers with
-[poptorch.BeginBlock](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.0.0/reference.html#poptorch.BeginBlock).
+[poptorch.BeginBlock](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.1.0/reference.html#poptorch.BeginBlock).
 
 You can use a combination of these three annotation options.
 In this tutorial we will use the `poptorch.Block` scope.
@@ -339,7 +339,7 @@ class TrainingModelWithLoss(torch.nn.Module):
 
 """
 The training model is called with an instance of
-`TrainingModelWithLoss`, model options, and the [AdamW optimiser](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.0.0/reference.html#poptorch.optim.AdamW).
+`TrainingModelWithLoss`, model options, and the [AdamW optimiser](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.1.0/reference.html#poptorch.optim.AdamW).
 The next section of this tutorial will explain how to set the model options for pipelining.
 """
 
@@ -363,9 +363,9 @@ Now that we have split the model into blocks, we are ready to define stages and 
 Then we will apply an execution strategy which will schedule the stages on the IPUs.
 We will consider two execution strategies:
 
-- [poptorch.PipelinedExecution](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.0.0/reference.html#poptorch.PipelinedExecution)
+- [poptorch.PipelinedExecution](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.1.0/reference.html#poptorch.PipelinedExecution)
 for efficient parallel utilisation;
-- and [poptorch.ShardedExecution](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.0.0/reference.html#poptorch.ShardedExecution) for debugging multi-IPU models.
+- and [poptorch.ShardedExecution](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.1.0/reference.html#poptorch.ShardedExecution) for debugging multi-IPU models.
 
 Note: This tutorial does not cover `poptorch.PhasedExecution` strategy, which is the third one available.
 
@@ -380,7 +380,7 @@ train_opts = poptorch.Options()
 #### Assigning blocks to stages and IPUs
 
 The blocks defined earlier now need to be assembled into stages and passed to the
-[poptorch.PipelinedExecution](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.0.0/reference.html#poptorch.PipelinedExecution)
+[poptorch.PipelinedExecution](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.1.0/reference.html#poptorch.PipelinedExecution)
 strategy object.
 This object defines a pipeline which enables parallel execution.
 
@@ -410,14 +410,14 @@ train_opts.setExecutionStrategy(poptorch.PipelinedExecution("B1", "B2", "B3", "B
 
 Instead of naming blocks, we could have placed them directly on specific IPUs by using the `ipu_id` argument in the `poptorch.Block` context manager.
 In that case PopTorch supports auto-staging which will automatically define one stage per block, placing each block on the specified IPU.
-`PipelinedExecution` and [AutoStage](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.0.0/overview.html#poptorch-autostage) are enabled by default in models which contain `poptorch.Block` contexts, decorators or `poptorch.BeginBlock` layers.
+`PipelinedExecution` and [AutoStage](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.1.0/overview.html#poptorch-autostage) are enabled by default in models which contain `poptorch.Block` contexts, decorators or `poptorch.BeginBlock` layers.
 Explicitly setting stages, as done in this tutorial, is required when `ipu_id` is not set.
 """
 """
 #### Setting gradient accumulation and device iterations
 
 Parallelisation during pipelined execution requires both the
-[deviceIterations](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.0.0/batching.html#poptorch-options-deviceiterations) and [gradientAccumulation](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.0.0/batching.html#poptorch-options-training-gradientaccumulation)
+[deviceIterations](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.1.0/batching.html#poptorch-options-deviceiterations) and [gradientAccumulation](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.1.0/batching.html#poptorch-options-training-gradientaccumulation)
 hyper-parameters to be set.
 
 - `gradientAccumulation` is used to push multiple mini-batches through the pipeline
@@ -441,7 +441,7 @@ The following execution profile illustrates how these parameters affect the comp
 """
 """
 To generate your own profile, call the example script `mnist_pipeline.py` with
-the `--profile` argument, you will find complete usage instructions for this
+the `--profile` argument, you will find complete use instructions for this
 script [at the end of the tutorial](#how-to-run-the-example-script).
 This option will generate `profile.pop` files which can be opened with the
 [Popvision Graph Analyser](https://docs.graphcore.ai/projects/graph-analyser-userguide/en/3.11.2/user-guide.html).
@@ -485,15 +485,15 @@ pipelined_strategy = poptorch.PipelinedExecution(
 This format places two blocks into two stages onto two IPUs instead of the four used earlier in the tutorial.
 
 More information on splitting models for pipelining are available in the
-[memory and performance optimisation guide](https://docs.graphcore.ai/projects/memory-performance-optimisation/en/3.0.0/optimising-performance.html#pipeline-execution-scheme), and
-the [TensorFlow pipelining technical note](https://docs.graphcore.ai/projects/tf-model-parallelism/en/3.0.0/index.html).
+[memory and performance optimisation guide](https://docs.graphcore.ai/projects/memory-performance-optimisation/en/3.1.0/optimising-performance.html#pipeline-execution-scheme), and
+the [TensorFlow pipelining technical note](https://docs.graphcore.ai/projects/tf-model-parallelism/en/3.1.0/index.html).
 
 """
 """
 ### Sharded execution (sequential)
 """
 """
-The [poptorch.ShardedExecution](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.0.0/reference.html#poptorch.ShardedExecution) option defines sequential execution.
+The [poptorch.ShardedExecution](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.1.0/reference.html#poptorch.ShardedExecution) option defines sequential execution.
 Unlike the pipelining mode, only one batch can be processed at a time so it is not a form of model parallelism.
 
 `ShardedExecution` can be useful for processing a single sample or
@@ -523,7 +523,7 @@ spent communicating with the host.
 In this code example, you can see how to set the storage on the device or host
 memory. We kept the default activations, weights, and accumulator on the device,
 while storing optimiser states to the host memory
-using [poptorch.Option.TensorLocations](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.0.0/reference.html#poptorch.options._TensorLocationOptions).
+using [poptorch.Option.TensorLocations](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.1.0/reference.html#poptorch.options._TensorLocationOptions).
 The `AdamW` optimiser is used in this tutorial and its optimiser state variables
 do not need to be stored in the device memory during the forward and backward
 propagation of the model.
@@ -532,9 +532,7 @@ streamed onto the device during the weight update and then streamed back to
 the host memory after they have been updated.
 """
 
-train_opts.TensorLocations.setOptimizerLocation(
-    poptorch.TensorLocationSettings().useOnChipStorage(False)
-)
+train_opts.TensorLocations.setOptimizerLocation(poptorch.TensorLocationSettings().useOnChipStorage(False))
 
 """
 ## Training the model
@@ -577,7 +575,7 @@ def accuracy(predictions, labels):
 When we call `training_model()`, the outputs are not returned for every
 mini-batch by default. This results in incomplete evaluation and inaccurate
 training accuracy. This behaviour can be changed by modifying
-[outputMode](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.0.0/reference.html#poptorch.OutputMode)
+[outputMode](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.1.0/reference.html#poptorch.OutputMode)
 in `poptorch.Options()`. For performance reasons, PopTorch uses
 `OutputMode.Final` by default. It only returns the final batch loss and
 predictions to the host machine. We can set this to `OutputMode.All` to be able
@@ -683,10 +681,10 @@ python3 mnist_pipeline.py --offload-optimiser
 """
 In this tutorial we achieved model parallelism on multiple IPUs with the PopTorch pipelining API.
 The model was partitioned to define the pipeline stages. Then, the pipelined execution strategy was set in the `poptorch.Options()` object.
-We generated profiles and used the Popvision Graph Analyser to visualise the execution trace and the memory usage on IPUs.
+We generated profiles and used the Popvision Graph Analyser to visualise the execution trace and the memory use on IPUs.
 The graph profiles help to identify imbalances between stages.
 This information is key to choosing a model partitioning that will reduce the time IPUs spend idle before synchronisation.
-Additionally, memory usage on the IPU was reduced at the expense of execution time by offloading optimiser-specific tensors to the host.
+Additionally, memory use on the IPU was reduced at the expense of execution time by offloading optimiser-specific tensors to the host.
 This trade-off is worth considering if you need to fit memory intensive models on the IPU.
 
 To continue your journey with the Graphcore IPU you may want to look at the
@@ -702,9 +700,9 @@ and [ViT](https://github.com/graphcore/examples/tree/v2.6.0/vision/vit/pytorch)
 models.
 
 If you are looking to port and optimise your own model, the
-[memory and performance optimisation guide](https://docs.graphcore.ai/projects/memory-performance-optimisation/en/3.0.0/index.html)
+[memory and performance optimisation guide](https://docs.graphcore.ai/projects/memory-performance-optimisation/en/3.1.0/index.html)
 will help you make the most of the hardware.
 Finally the
-[TensorFlow pipelining tech note](https://docs.graphcore.ai/projects/tf-model-parallelism/en/3.0.0/pipelining.html#optimising-the-pipeline)
+[TensorFlow pipelining tech note](https://docs.graphcore.ai/projects/tf-model-parallelism/en/3.1.0/pipelining.html#optimising-the-pipeline)
 contains additional information on the core concepts required to optimise your pipelined model.
 """
