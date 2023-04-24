@@ -19,13 +19,9 @@ transform = torchvision.transforms.Compose(
     ]
 )
 
-train_dataset = torchvision.datasets.FashionMNIST(
-    "~/.torch/datasets", transform=transform, download=True, train=True
-)
+train_dataset = torchvision.datasets.FashionMNIST("~/.torch/datasets", transform=transform, download=True, train=True)
 
-test_dataset = torchvision.datasets.FashionMNIST(
-    "~/.torch/datasets", transform=transform, download=True, train=False
-)
+test_dataset = torchvision.datasets.FashionMNIST("~/.torch/datasets", transform=transform, download=True, train=False)
 
 classes = (
     "T-shirt",
@@ -83,9 +79,7 @@ model.train()
 
 opts = poptorch.Options()
 
-train_dataloader = poptorch.DataLoader(
-    opts, train_dataset, batch_size=16, shuffle=True, num_workers=20
-)
+train_dataloader = poptorch.DataLoader(opts, train_dataset, batch_size=16, shuffle=True, num_workers=20)
 
 optimizer = poptorch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 
@@ -119,9 +113,7 @@ from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDis
 
 print(f"Eval accuracy: {100 * accuracy_score(labels, predictions):.2f}%")
 cm = confusion_matrix(labels, predictions)
-cm_plot = ConfusionMatrixDisplay(cm, display_labels=classes).plot(
-    xticks_rotation="vertical"
-)
+cm_plot = ConfusionMatrixDisplay(cm, display_labels=classes).plot(xticks_rotation="vertical")
 
 cm_plot.figure_.savefig("confusion_matrix.png")
 
@@ -175,12 +167,6 @@ model.eval()
 output = model(img_tensor)
 print("CPU predicted class:", classes[int(output.argmax())])
 
-opts = (
-    poptorch.Options()
-    .deviceIterations(20)
-    .replicationFactor(2)
-    .randomSeed(123)
-    .useIpuModel(True)
-)
+opts = poptorch.Options().deviceIterations(20).replicationFactor(2).randomSeed(123).useIpuModel(True)
 
 # Generated:2022-09-27T15:26 Source:walkthrough.py SST:0.0.8

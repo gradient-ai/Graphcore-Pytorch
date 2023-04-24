@@ -59,9 +59,7 @@ if __name__ == "__main__":
         action="store_true",
         help="Use IPU-generated synthetic data",
     )
-    parser.add_argument(
-        "--replicas", type=int, default=1, help="IPU replication factor"
-    )
+    parser.add_argument("--replicas", type=int, default=1, help="IPU replication factor")
     args = parser.parse_args()
     replicas = args.replicas
 
@@ -79,9 +77,7 @@ if __name__ == "__main__":
     print_parameters(args)
 
     # Setup a PopTorch training model
-    training_model = poptorch.trainingModel(
-        model, opts, poptorch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
-    )
+    training_model = poptorch.trainingModel(model, opts, poptorch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9))
 
     # Create a dataset from random data
     features = torch.randn([10000, 1, 128, 128])

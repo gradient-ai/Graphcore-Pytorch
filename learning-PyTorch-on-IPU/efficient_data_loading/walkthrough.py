@@ -2,7 +2,7 @@
 Copyright (c) 2021 Graphcore Ltd. All rights reserved.
 """
 """
-# Efficient data loading with PopTorch
+# Efficient Data Loading with PopTorch
 """
 """
 This tutorial will present how PopTorch can help to efficiently load data to
@@ -28,7 +28,7 @@ If you are familiar with PyTorch you may have used
 [torch.utils.data.DataLoader](https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader).
 
 PopTorch provides [its own
-DataLoader](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.0.0/batching.html#poptorch-dataloader)
+DataLoader](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.1.0/batching.html#poptorch-dataloader)
 which is a wrapper around `torch.utils.data.DataLoader`. It accepts the same
 arguments as PyTorch's DataLoader with some extra features specific to the IPU:
 
@@ -38,11 +38,11 @@ arguments as PyTorch's DataLoader with some extra features specific to the IPU:
 - It enables asynchronous data loading.
 
 See the
-[documentation](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.0.0/batching.html#poptorch-asynchronousdataaccessor)
+[PopTorch User Guide](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.1.0/batching.html#poptorch-asynchronousdataaccessor)
 for more information about asynchronous mode.
 """
 """
-> **Note**: When executing code from this tutorial in a python script, it
+> **Note**: When executing code from this tutorial in a Python script, it
 > requires this conditional block:
 >
 > ```python
@@ -50,14 +50,14 @@ for more information about asynchronous mode.
 > ```
 >
 > This is necessary to avoid [issues with asynchronous
-> DataLoader](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.0.0/batching.html#poptorch-asynchronousdataaccessor).
+> DataLoader](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.1.0/batching.html#poptorch-asynchronousdataaccessor).
 > The asynchronous dataloader calls the spawn method, which creates a new
-> python interpreter. This interpreter will import the main module of the
+> Python interpreter. This interpreter will import the main module of the
 > application. Therefore, we need protection against infinite spawning of new
 > processes and repeated, undesirable code invocations and so the entire
 > executable part of the script should be in an `if` block. Function and class
 > definitions do not have to be in this block. This change does not apply to
-> interactive python Interpreters (e.g. Jupyter notebooks) which support
+> interactive Python Interpreters (for example Jupyter notebooks) which support
 > multiprocessing in a different way.
 
 <!-- separate blocks to prevent them being rendered together -->
@@ -153,9 +153,7 @@ model.train()  # Switch the model to training mode
 # Models are initialised in training mode by default, so the line above will
 # have no effect. Its purpose is to show how the mode can be set explicitly.
 
-training_model = poptorch.trainingModel(
-    model, opts, torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
-)
+training_model = poptorch.trainingModel(model, opts, torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9))
 
 """
 Now we will create a sample random dataset, which we will later use to
@@ -229,7 +227,7 @@ The number of batches of data returned to the host depends on the option
 all the output tensors when you use a `inferenceModel()` while you will often
 not need to receive all or any of the output tensors when you use a
 `trainingModel`. See the
-[documentation](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.0.0/reference.html?highlight=anchormode#poptorch.Options.outputMode)
+[PopTorch User Guide](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.1.0/reference.html?highlight=anchormode#poptorch.Options.outputMode)
 for more information about `poptorch.Options.outputMode`.
 
 In this case presented above, we are using a `trainingModel` and
@@ -274,8 +272,8 @@ have ***K*** mini-batches per weight update.
 Then, for one device iteration with pipeline we have multiplied the number of
 samples processed by ***K***.
 
-More information about gradient accumulation can be found [in the PopTorch User
-Guide](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.0.0/batching.html#poptorch-options-training-gradientaccumulation).
+More information about gradient accumulation can be found in the [PopTorch User
+Guide](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.1.0/batching.html#poptorch-options-training-gradientaccumulation).
 """
 """
 ### Replication
@@ -435,9 +433,7 @@ model = ClassificationModel()
 training_model = poptorch.trainingModel(
     model,
     opts,
-    poptorch.optim.SGD(
-        model.parameters(), lr=0.001, momentum=0.9, use_combined_accum=False
-    ),
+    poptorch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9, use_combined_accum=False),
 )
 training_data = poptorch.DataLoader(
     opts,
@@ -540,7 +536,7 @@ In that case increasing the number of device iterations and using a smaller
 global batch-size should not harm.
 """
 """
-#### Conclusion: Training and inference sessions
+#### Conclusion: training and inference sessions
 
 Finally, as a general recommendation these two parameters have to be tuned so
 your DataLoader can consume the whole dataset in the smallest number of steps
@@ -591,9 +587,7 @@ def validate_model_performance(
     training_model = poptorch.trainingModel(
         model,
         opts,
-        poptorch.optim.SGD(
-            model.parameters(), lr=0.001, momentum=0.9, use_combined_accum=False
-        ),
+        poptorch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9, use_combined_accum=False),
     )
 
     training_data = poptorch.DataLoader(
@@ -641,7 +635,7 @@ def validate_model_performance(
 Now we are ready to conduct experiments:
 """
 """
-### Case 1: No bottleneck
+### Case 1: no bottleneck
 
 - mini-batch size: 16
 - replica: 1 (no replication)
@@ -683,7 +677,7 @@ copies on the IPU. It also excludes the synchronisation time with the host.
 
 """
 """
-### Case 2: Larger global batch size with replication
+### Case 2: larger global batch size with replication
 
 Let's try to get better training performances by increasing the global batch
 size. We can choose to increase the replication factor so it avoids loading
@@ -743,7 +737,6 @@ file: `tuto_data_loading.py`. Helpful arguments:
   throughput with the model throughput on synthetic data;
 - Asynchronous mode can provide better throughput performance.
 
-Further information on Host-IPU IO optimisation can be found in our [memory and
-performance optimisation
-guide](https://docs.graphcore.ai/projects/memory-performance-optimisation/en/3.0.0/optimising-performance.html#host-ipu-io-optimisation).
+Further information on Host-IPU I/O optimisation can be found in the technical note
+[Memory and Performance Optimisation on the IPU](https://docs.graphcore.ai/projects/memory-performance-optimisation/en/3.1.0/optimising-performance.html#host-ipu-io-optimisation).
 """

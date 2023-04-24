@@ -2,7 +2,7 @@
 Copyright (c) 2021 Graphcore Ltd. All rights reserved.
 """
 """
-# Half and mixed precision in PopTorch
+# Half and Mixed Precision in PopTorch
 
 This tutorial shows how to use half and mixed precision in PopTorch with the
 example task of training a simple CNN model on a single Graphcore IPU (Mk1 or
@@ -33,7 +33,7 @@ we use either integers or real numbers. Real numbers are represented by one
 of several floating point formats, which vary in how many bits they use to
 represent each number. Using more bits allows for greater precision and a
 wider range of representable numbers, whereas using fewer bits allows for
-faster calculations and reduces memory and power usage.
+faster calculations and reduces memory and power use.
 
 In deep learning applications, where less precise calculations are acceptable
 and throughput is critical, using a lower precision format can provide
@@ -209,7 +209,7 @@ partials_half = args.partials_half
 # sst_ignore_jupyter
 # sst_ignore_md
 """
-#### Casting a model's parameters
+#### Casting the model parameters
 
 The default data type of the parameters of a PyTorch module is FP32
 (`torch.float32`). To convert all the parameters of a model to be represented
@@ -224,7 +224,7 @@ if execution_half:
 For this tutorial, we will cast all the model's parameters to FP16.
 """
 """
-#### Casting a single layer's parameters
+#### Casting parameters for a single layer
 
 For bigger or more complex models, downcasting all the layers may generate
 numerical instabilities and cause underflows. While the PopTorch and the IPU
@@ -263,12 +263,8 @@ transform = transforms.Compose(transform_list)
 """
 Pull the datasets if they are not available locally:
 """
-train_dataset = torchvision.datasets.FashionMNIST(
-    "~/.torch/datasets", transform=transform, download=True, train=True
-)
-test_dataset = torchvision.datasets.FashionMNIST(
-    "~/.torch/datasets", transform=transform, download=True, train=False
-)
+train_dataset = torchvision.datasets.FashionMNIST("~/.torch/datasets", transform=transform, download=True, train=True)
+test_dataset = torchvision.datasets.FashionMNIST("~/.torch/datasets", transform=transform, download=True, train=False)
 
 # sst_hide_output
 """
@@ -282,9 +278,7 @@ using a model in FP16 requires the argument `accum_type` to be set to
 """
 accum, loss_scaling = (torch.float16, 1024) if optimizer_half else (torch.float32, None)
 
-optimizer = poptorch.optim.AdamW(
-    params=model.parameters(), lr=0.001, accum_type=accum, loss_scaling=loss_scaling
-)
+optimizer = poptorch.optim.AdamW(params=model.parameters(), lr=0.001, accum_type=accum, loss_scaling=loss_scaling)
 """
 While higher values of `loss_scaling` minimize underflows, values that are
 too high can also generate overflows as well as hurt convergence of the loss.
@@ -292,7 +286,7 @@ The optimal value depends on the model and the training job. This is therefore
 a hyperparameter for you to tune.
 """
 """
-### Set PopTorch's options
+### Set PopTorch options
 
 To configure some features of the IPU and to be able to use PopTorch's classes
 in the next sections, we will need to create an instance of `poptorch.Options`
@@ -307,10 +301,10 @@ opts = poptorch.Options()
 """
 > **NOTE**: This tutorial has been designed to be run on a single IPU.
 > If you do not have access to an IPU, you can use the option
-> [`useIpuModel`](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.0.0/overview.html#poptorch.Options.useIpuModel)
-> to run a simulation on CPU instead. You can read more on the IPU Model and
-> its limitations
-> [here](https://docs.graphcore.ai/projects/poplar-user-guide/en/3.0.0/poplar_programs.html#programming-with-poplar).
+> [`useIpuModel`](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.1.0/overview.html#poptorch.Options.useIpuModel)
+> to run a simulation on a CPU instead. You can read more on the IPU Model and
+> its limitations in the
+> [Poplar User Guide](https://docs.graphcore.ai/projects/poplar-user-guide/en/3.1.0/poplar_programs.html#programming-with-poplar).
 """
 """
 #### Stochastic rounding on IPU
@@ -346,7 +340,7 @@ else:
 """
 Further information on the Partials Type setting can be found in our [memory and
 performance optimisation
-guide](https://docs.graphcore.ai/projects/memory-performance-optimisation/en/3.0.0/common-memory-optimisations.html#partials-type).
+guide](https://docs.graphcore.ai/projects/memory-performance-optimisation/en/3.1.0/common-memory-optimisations.html#partials-type).
 """
 """
 ### Train the model
@@ -355,9 +349,7 @@ We can now train the model. After we have set all our options, we reuse
 our `poptorch.Options` instance for the training `poptorch.DataLoader`
 that we will be using:
 """
-train_dataloader = poptorch.DataLoader(
-    opts, train_dataset, batch_size=12, shuffle=True, num_workers=40
-)
+train_dataloader = poptorch.DataLoader(opts, train_dataset, batch_size=12, shuffle=True, num_workers=40)
 """
 We first make sure our model is in training mode, and then wrap it
 with `poptorch.trainingModel`:
@@ -426,7 +418,7 @@ and "target" represent the model trained in FP16 and FP32 respectively:
 
 ![Comparison of memory footprints](static/MemoryDiffReport.png)
 
-We observed a ~26% reduction in memory usage with the settings of this
+We observed a ~26% reduction in memory use with the settings of this
 tutorial, including from peak to peak. The impact on the accuracy was also
 small, with less than 1% lost!
 
@@ -466,5 +458,5 @@ POPLAR_ENGINE_OPTIONS = '{"debug.floatPointOpException": "true"}'
 
 - The [PopVision Graph
   Analyser](https://docs.graphcore.ai/projects/graph-analyser-userguide/en/3.11.2/index.html)
-  can be used to inspect the memory usage of a model and to help debug issues.
+  can be used to inspect the memory use of a model and to help debug issues.
 """

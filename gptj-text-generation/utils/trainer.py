@@ -86,12 +86,13 @@ class GPTJTrainer:
                         hf_mapping_lm_tp(self.eval_config, self.inference_session, self.pretrained)
                     )
                 self.raw_answers = run_validation(
-                    self.eval_config, self.inference_session, self.eval_dataset, self.tokenizer)
+                    self.eval_config, self.inference_session, self.eval_dataset, self.tokenizer
+                )
             else:
                 self.raw_answers = run_validation(
                     self.eval_config, self.inference_session, self.eval_dataset, self.tokenizer, self.train_session
                 )
-                
+
             formatted_answers = self.process_answers_func(self.raw_answers)
 
         metrics = self.metric.compute(predictions=formatted_answers, references=self.eval_dataset["label"])

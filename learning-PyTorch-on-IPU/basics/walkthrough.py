@@ -2,7 +2,7 @@
 Copyright (c) 2020 Graphcore Ltd. All rights reserved.
 """
 """
-# Introduction to PopTorch - running a simple model
+# Introduction to PopTorch - Running a Simple Model
 
 This tutorial covers the basics of model making in PyTorch, using
 `torch.nn.Module`, and the specific methods to convert a PyTorch model to
@@ -54,8 +54,8 @@ to TorchScript tutorial](https://pytorch.org/tutorials/beginner/Intro_to_TorchSc
 PopTorch has been designed to require only a few manual changes to your models
 in order to run them on the IPU. However, it does have some differences from
 native PyTorch execution and not all PyTorch operations have been
-implemented in the backend yet. You can find the list of supported operations
-[here](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.0.0/supported_ops.html).
+implemented in the backend yet. You can find the list of supported operations in
+[PyTorch for the IPU: User Guide](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.1.0/supported_ops.html).
 
 ![Software stack](static/stack.jpg)
 """
@@ -133,13 +133,9 @@ transform = torchvision.transforms.Compose(
     ]
 )
 
-train_dataset = torchvision.datasets.FashionMNIST(
-    "~/.torch/datasets", transform=transform, download=True, train=True
-)
+train_dataset = torchvision.datasets.FashionMNIST("~/.torch/datasets", transform=transform, download=True, train=True)
 
-test_dataset = torchvision.datasets.FashionMNIST(
-    "~/.torch/datasets", transform=transform, download=True, train=False
-)
+test_dataset = torchvision.datasets.FashionMNIST("~/.torch/datasets", transform=transform, download=True, train=False)
 
 classes = (
     "T-shirt",
@@ -183,7 +179,7 @@ loading, a sampling strategy, shuffling, etc.
 """
 """
 PopTorch offers an extension of this class with its
-[`poptorch.DataLoader`](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.0.0/batching.html#poptorch-dataloader)
+[`poptorch.DataLoader`](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.1.0/batching.html#poptorch-dataloader)
 class, specialised for the way the underlying PopART framework handles
 batching of data. We will use this class later in the tutorial, as soon as we
 have a model ready for training.
@@ -242,9 +238,7 @@ The compilation and execution on the IPU can be controlled using
 """
 opts = poptorch.Options()
 
-train_dataloader = poptorch.DataLoader(
-    opts, train_dataset, batch_size=16, shuffle=True, num_workers=20
-)
+train_dataloader = poptorch.DataLoader(opts, train_dataset, batch_size=16, shuffle=True, num_workers=20)
 """
 ### Train the model
 
@@ -259,7 +253,7 @@ parameters such as loss/velocity scaling.
 """
 """
 We will use
-[SGD](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.0.0/reference.html#poptorch.optim.SGD)
+[SGD](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.1.0/reference.html#poptorch.optim.SGD)
 as it's a very popular algorithm and is appropriate for this classification
 task.
 """
@@ -397,9 +391,7 @@ from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDis
 
 print(f"Eval accuracy: {100 * accuracy_score(labels, predictions):.2f}%")
 cm = confusion_matrix(labels, predictions)
-cm_plot = ConfusionMatrixDisplay(cm, display_labels=classes).plot(
-    xticks_rotation="vertical"
-)
+cm_plot = ConfusionMatrixDisplay(cm, display_labels=classes).plot(xticks_rotation="vertical")
 """
 As you can see, although we've got an accuracy score of ~89%, the model's
 performance across the different classes isn't equal. Trousers are very well
@@ -548,7 +540,7 @@ PyTorch users to use IPUs.
 """
 """
 The list of these options is available in the
-[documentation](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.0.0/overview.html#options).
+[PopTorch User Guide](https://docs.graphcore.ai/projects/poptorch-user-guide/en/3.1.0/overview.html#options).
 We introduce here four of these options so you get an idea of what they cover.
 """
 """
@@ -592,7 +584,7 @@ still need to make progress on your code. However, the IPU Model doesn't
 fully support replicated graphs and its numerical results can be slightly
 different from what you would get with an actual IPU. You can learn more
 about the IPU Model and its limitations with our
-[documentation](https://docs.graphcore.ai/projects/poplar-user-guide/en/3.0.0/poplar_programs.html?highlight=ipu%20model#programming-with-poplar).
+[Poplar User Guide](https://docs.graphcore.ai/projects/poplar-user-guide/en/3.1.0/poplar_programs.html?highlight=ipu%20model#programming-with-poplar).
 """
 """
 ## How to set the options
@@ -600,13 +592,7 @@ about the IPU Model and its limitations with our
 These options are callable, and can be chained as they return the instance. One
 can therefore do the following:
 """
-opts = (
-    poptorch.Options()
-    .deviceIterations(20)
-    .replicationFactor(2)
-    .randomSeed(123)
-    .useIpuModel(True)
-)
+opts = poptorch.Options().deviceIterations(20).replicationFactor(2).randomSeed(123).useIpuModel(True)
 """
 ## Summary
 In this tutorial, we started learning about PopTorch and how to use it to create and train
@@ -624,7 +610,7 @@ sure that we were aware of the limitations of our model.
 ### Next steps:
 To continue learning about PopTorch and how to use it to run your models on the
 IPU, look at our tutorials on [efficient data
-loading](../efficient_data_loading), [using half and mixed precision](../mixed_precision), [fine-tuning a BERT model to run on the
- IPU](../../finetuning_bert) and [pipelining your model in
-PopTorch](../pipelining).
+loading](../efficient_data_loading), [pipelining your model in
+PopTorch](../pipelining) and [fine-tuning a BERT model to run on the
+IPU](../finetuning_bert).
 """

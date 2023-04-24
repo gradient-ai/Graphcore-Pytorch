@@ -211,7 +211,7 @@ def create_decoder_block_graph(config: GPTJConfig, optimizer: addons.Module, *ar
         blk_graph = GraphWithNamedArgs(layer.fwd.graph.called_graphs[0])
         grad_blk_graph = addons.transforms.autodiff(blk_graph, grads_required=blk_graph.graph.inputs[:-2])
         grad_blk_graph = addons.transforms.recompute_graph(grad_blk_graph)
-        called_graphs_grad_info[blk_graph.graph.id] = grad_blk_graph.grad_graph_info
+        called_graphs_grad_info[blk_graph.graph] = grad_blk_graph.grad_graph_info
 
     grad_facts, layer.bwd = addons.autodiff_with_accumulation(
         layer.fwd,

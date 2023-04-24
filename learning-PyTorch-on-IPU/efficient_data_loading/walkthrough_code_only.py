@@ -71,9 +71,7 @@ model.train()  # Switch the model to training mode
 # Models are initialised in training mode by default, so the line above will
 # have no effect. Its purpose is to show how the mode can be set explicitly.
 
-training_model = poptorch.trainingModel(
-    model, opts, torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
-)
+training_model = poptorch.trainingModel(model, opts, torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9))
 
 features = torch.randn([10000, 1, 128, 128])
 labels = torch.empty([10000], dtype=torch.long).random_(10)
@@ -120,9 +118,7 @@ model = ClassificationModel()
 training_model = poptorch.trainingModel(
     model,
     opts,
-    poptorch.optim.SGD(
-        model.parameters(), lr=0.001, momentum=0.9, use_combined_accum=False
-    ),
+    poptorch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9, use_combined_accum=False),
 )
 training_data = poptorch.DataLoader(
     opts,
@@ -174,9 +170,7 @@ def validate_model_performance(
     training_model = poptorch.trainingModel(
         model,
         opts,
-        poptorch.optim.SGD(
-            model.parameters(), lr=0.001, momentum=0.9, use_combined_accum=False
-        ),
+        poptorch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9, use_combined_accum=False),
     )
 
     training_data = poptorch.DataLoader(

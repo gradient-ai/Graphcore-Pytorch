@@ -36,11 +36,8 @@ class CustomModel(nn.Module):
         return x
 
 
-# Cast the model parameters to FP16
-model_half = True
-
-# Cast the data to FP16
-data_half = True
+# Cast the model parameters and data to FP16
+execution_half = True
 
 # Cast the accumulation of gradients values types of the optimiser to FP16
 optimizer_half = True
@@ -55,43 +52,35 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    "--model-half",
-    dest="model_half",
+    "--execution-half",
     action="store_true",
-    help="Cast the model parameters to FP16",
-)
-parser.add_argument(
-    "--data-half", dest="data_half", action="store_true", help="Cast the data to FP16"
+    help="Cast the model parameters and data to FP16",
 )
 parser.add_argument(
     "--optimizer-half",
-    dest="optimizer_half",
     action="store_true",
     help="Cast the accumulation type of the optimiser to FP16",
 )
 parser.add_argument(
     "--stochastic-rounding",
-    dest="stochastic_rounding",
     action="store_true",
     help="Use stochastic rounding",
 )
 parser.add_argument(
     "--partials-half",
-    dest="partials_half",
     action="store_true",
     help="Set partials data type to FP16",
 )
 args = parser.parse_args()
 
-model_half = args.model_half
-data_half = args.data_half
+execution_half = args.execution_half
 optimizer_half = args.optimizer_half
 stochastic_rounding = args.stochastic_rounding
 partials_half = args.partials_half
 
 model = CustomModel()
 
-if model_half:
+if execution_half:
     model = model.half()
 
 transform_list = [
@@ -99,23 +88,17 @@ transform_list = [
     transforms.ToTensor(),
     transforms.Normalize((0.5,), (0.5,)),
 ]
-if data_half:
+if execution_half:
     transform_list.append(transforms.ConvertImageDtype(torch.half))
 
 transform = transforms.Compose(transform_list)
 
-train_dataset = torchvision.datasets.FashionMNIST(
-    "~/.torch/datasets", transform=transform, download=True, train=True
-)
-test_dataset = torchvision.datasets.FashionMNIST(
-    "~/.torch/datasets", transform=transform, download=True, train=False
-)
+train_dataset = torchvision.datasets.FashionMNIST("~/.torch/datasets", transform=transform, download=True, train=True)
+test_dataset = torchvision.datasets.FashionMNIST("~/.torch/datasets", transform=transform, download=True, train=False)
 
 accum, loss_scaling = (torch.float16, 1024) if optimizer_half else (torch.float32, None)
 
-optimizer = poptorch.optim.AdamW(
-    params=model.parameters(), lr=0.001, accum_type=accum, loss_scaling=loss_scaling
-)
+optimizer = poptorch.optim.AdamW(params=model.parameters(), lr=0.001, accum_type=accum, loss_scaling=loss_scaling)
 
 opts = poptorch.Options()
 
@@ -127,9 +110,7 @@ if partials_half:
 else:
     opts.Precision.setPartialsType(torch.float)
 
-train_dataloader = poptorch.DataLoader(
-    opts, train_dataset, batch_size=12, shuffle=True, num_workers=40
-)
+train_dataloader = poptorch.DataLoader(opts, train_dataset, batch_size=12, shuffle=True, num_workers=40)
 
 model.train()  # Switch the model to training mode
 poptorch_model = poptorch.trainingModel(model, options=opts, optimizer=optimizer)
@@ -160,4 +141,4 @@ print(
                 torch.tensor(predictions))) / len(labels)):.2f}%"""
 )
 
-# Generated:2022-09-27T15:33 Source:walkthrough.py SST:0.0.8
+# Generated:2022-11-22T13:41 Source:walkthrough.py SST:0.0.9
