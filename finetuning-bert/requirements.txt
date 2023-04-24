@@ -3,3 +3,4 @@ jedi==0.17.2
 tqdm
 transformers==4.20.1
 datasets
+examples-utils[common] @ git+https://github.com/graphcore/examples-utils@latest_stable

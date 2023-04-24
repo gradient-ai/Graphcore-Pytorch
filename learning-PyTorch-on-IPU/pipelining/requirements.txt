@@ -4,3 +4,4 @@ tqdm==4.64.0
 pytest==5.4.3
 torch==1.13.1
 ipywidgets==7.7.2
+examples-utils[common] @ git+https://github.com/graphcore/examples-utils@latest_stable

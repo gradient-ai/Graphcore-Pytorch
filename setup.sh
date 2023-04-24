@@ -33,6 +33,11 @@ export CHECKPOINT_DIR="/tmp/checkpoints"
 # in the Paperspace environment this would be ="/datasets"
 export PUBLIC_DATASETS_DIR="/datasets"
 
+# Logger specific vars
+export TIER_TYPE=$(python .gradient/check_tier.py)
+export FIREHOSE_STREAM_NAME="paperspacenotebook_production"
+export GCLOGGER_CONFIG="${PUBLIC_DATASETS_DIR}/gcl"
+
 # Fine-tuning BERT uses the HF Squad dataset
 export HUGGINGFACE_HUB_CACHE="/tmp/huggingface_caches"
 export TRANSFORMERS_CACHE="/tmp/huggingface_caches/checkpoints"
