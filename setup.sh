@@ -25,7 +25,9 @@ fi
 export NUM_AVAILABLE_IPU=${IPU_ARG}
 export GRAPHCORE_POD_TYPE="pod${IPU_ARG}"
 
+# Logger specific vars
 export TIER_TYPE=$(python .gradient/check_tier.py)
+export FIREHOSE_STREAM_NAME="paperspacenotebook_production"
 
 export POPLAR_EXECUTABLE_CACHE_DIR="/tmp/exe_cache"
 export DATASETS_DIR="/tmp/dataset_cache"
