@@ -25,10 +25,6 @@ fi
 export NUM_AVAILABLE_IPU=${IPU_ARG}
 export GRAPHCORE_POD_TYPE="pod${IPU_ARG}"
 
-# Logger specific vars
-export TIER_TYPE=$(python .gradient/check_tier.py)
-export FIREHOSE_STREAM_NAME="paperspacenotebook_production"
-
 export POPLAR_EXECUTABLE_CACHE_DIR="/tmp/exe_cache"
 export DATASETS_DIR="/tmp/dataset_cache"
 export CHECKPOINT_DIR="/tmp/checkpoints"
@@ -36,6 +32,10 @@ export CHECKPOINT_DIR="/tmp/checkpoints"
 # mounted public dataset directory (path in the container)
 # in the Paperspace environment this would be ="/datasets"
 export PUBLIC_DATASETS_DIR="/datasets"
+
+# Logger specific vars
+export TIER_TYPE=$(python .gradient/check_tier.py)
+export FIREHOSE_STREAM_NAME="paperspacenotebook_production"
 export GCLOGGER_CONFIG="${PUBLIC_DATASETS_DIR}/gcl"
 
 # Fine-tuning BERT uses the HF Squad dataset
