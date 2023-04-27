@@ -1,4 +1,4 @@
-#! /usr/bin/env bash 
+#! /usr/bin/env bash
 set -uxo pipefail
 
 if [ ! "$(command -v fuse-overlayfs)" ]
@@ -9,6 +9,7 @@ then
 fi
 
 
+mkdir -p ${PERSISTENT_CHECKPOINT_DIR}
 echo "Starting preparation of datasets"
 /notebooks/.gradient/symlink_datasets_and_caches.py
 
